@@ -1,0 +1,30 @@
+{
+    "releases": [
+        {
+            "version": "2.0.0",
+            "build_number": 2,
+            "apk_url": "/apk/releases/weatherly-2.0.0.apk",
+            "file_size_bytes": null,
+            "released_at": null,
+            "sha256": null,
+            "changelog": [
+                "In-app updates with verified downloads",
+                "Offline support with last-known weather",
+                "Fixed night icons and activity gauges",
+                "Alerts now load more results without losing the list",
+                "Performance and reliability improvements"
+            ]
+        },
+        {
+            "version": "1.0.0",
+            "build_number": 1,
+            "apk_url": "/apk/releases/weatherly-1.0.0.apk",
+            "file_size_bytes": null,
+            "released_at": null,
+            "sha256": null,
+            "changelog": [
+                "Initial release"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+<!-- web/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta id="theme-color-meta" name="theme-color" content="#0C0A09" />
+    <meta name="description"
+        content="Premium weather platform with multi-provider aggregation and intelligent analytics." />
+
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('weatherly_theme') || 'system';
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var isDark = stored === 'dark' || (stored === 'system' && prefersDark);
+                document.documentElement.classList.toggle('dark', isDark);
+                var meta = document.getElementById('theme-color-meta');
+                if (meta) meta.setAttribute('content', isDark ? '#0C0A09' : '#FAFAF9');
+            } catch (e) { }
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+
+    <title>Weatherly</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

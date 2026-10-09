@@ -1,0 +1,366 @@
+/* web/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --color-brand-400: #FB923C;
+        --color-brand-500: #F97316;
+        --color-brand-600: #EA580C;
+
+        --color-severity-extreme: #DC2626;
+        --color-severity-severe: #F97316;
+        --color-severity-moderate: #FBBF24;
+        --color-severity-minor: #A8A29E;
+        --color-severity-unknown: #F59E0B;
+
+        --color-aqi-good: #22C55E;
+        --color-aqi-moderate: #F59E0B;
+        --color-aqi-sensitive: #F97316;
+        --color-aqi-unhealthy: #EF4444;
+        --color-aqi-very-unhealthy: #A855F7;
+        --color-aqi-hazardous: #881337;
+
+        --color-uv-low: #22C55E;
+        --color-uv-moderate: #F59E0B;
+        --color-uv-high: #F97316;
+        --color-uv-very-high: #EF4444;
+        --color-uv-extreme: #A855F7;
+
+        --space-page-x: clamp(0.875rem, 2.5vw, 2rem);
+        --space-page-y: clamp(0.875rem, 2.5vw, 2rem);
+        --space-card: clamp(0.75rem, 2vw, 1.25rem);
+        --space-stack: clamp(0.75rem, 1.8vw, 1.5rem);
+
+        --radius-card: clamp(1.25rem, 2.5vw, 1.75rem);
+        --radius-hero: clamp(1.75rem, 4vw, 2.5rem);
+
+        --font-hero: clamp(3.25rem, 14vw, 9rem);
+        --font-display: clamp(1.5rem, 4.5vw, 2.25rem);
+        --font-section: clamp(1.05rem, 2.4vw, 1.25rem);
+
+        --topbar-h: 56px;
+        --bottombar-h: 64px;
+        --notice-gap: 0.5rem;
+    }
+
+    html {
+        @apply scroll-smooth;
+        -webkit-tap-highlight-color: transparent;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    body {
+        @apply bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-50 font-sans antialiased;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+        width: 100%;
+        min-width: 320px;
+    }
+
+    #root {
+        overflow-x: hidden;
+    }
+
+    input,
+    textarea,
+    select {
+        @apply outline-none;
+    }
+
+    ::selection {
+        @apply bg-orange-500/30 text-orange-50;
+    }
+
+    @media (prefers-contrast: more) {
+
+        .glass,
+        .glass-elevated,
+        .glass-pill,
+        .glass-metric {
+            @apply border-2 border-stone-900 dark:border-white;
+        }
+
+        .btn-primary,
+        .btn-outline,
+        .btn-ghost {
+            @apply border-2 border-current;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+@layer components {
+    .glass {
+        @apply bg-white/80 border border-stone-200/80 shadow-lg shadow-stone-900/[0.08] backdrop-blur-xl dark:bg-white/[0.04] dark:border-white/[0.07] dark:shadow-none;
+        border-radius: var(--radius-card);
+    }
+
+    .glass-elevated {
+        @apply bg-white/90 border border-stone-200/80 shadow-xl shadow-stone-900/[0.12] backdrop-blur-2xl dark:bg-white/[0.06] dark:border-white/[0.09] dark:shadow-none;
+        border-radius: var(--radius-card);
+    }
+
+    .glass-pill {
+        @apply bg-white/70 border border-stone-200/70 backdrop-blur-xl dark:bg-white/[0.06] dark:border-white/[0.08] rounded-full;
+    }
+
+    .glass-metric {
+        @apply bg-stone-50/80 dark:bg-white/[0.03] border border-stone-100 dark:border-white/[0.05] backdrop-blur-md;
+        border-radius: calc(var(--radius-card) - 0.5rem);
+    }
+
+    .glass-topbar {
+        @apply bg-white/85 dark:bg-stone-950/80 border-b border-stone-200/70 dark:border-white/[0.07] backdrop-blur-2xl;
+    }
+
+    .label {
+        @apply text-[10px] font-semibold text-stone-500 dark:text-stone-500 uppercase tracking-wider;
+    }
+
+    .metric-value {
+        font-size: clamp(1.25rem, 3.4vw, 1.875rem);
+        @apply font-semibold tracking-tight text-stone-800 dark:text-stone-200;
+    }
+
+    .section-heading {
+        font-size: var(--font-section);
+        @apply font-semibold tracking-tight text-stone-900 dark:text-stone-50;
+    }
+
+    .card-heading {
+        @apply text-sm font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider;
+    }
+
+    .page-heading {
+        font-size: var(--font-display);
+        @apply font-semibold tracking-tight text-stone-900 dark:text-stone-50;
+    }
+
+    .page-shell {
+        padding-left: var(--space-page-x);
+        padding-right: var(--space-page-x);
+        padding-top: var(--space-page-y);
+        padding-bottom: var(--space-page-y);
+    }
+
+    .stack-y {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-stack);
+    }
+
+    .skeleton-surface {
+        @apply relative overflow-hidden bg-stone-200/70 dark:bg-white/[0.06] rounded-2xl;
+    }
+
+    .skeleton-surface::after {
+        content: '';
+        @apply absolute inset-0 -translate-x-full;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+        animation: shimmer-sweep 1.6s ease-in-out infinite;
+    }
+
+    .dark .skeleton-surface::after {
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    }
+
+    .btn-primary {
+        @apply bg-gradient-to-b from-orange-400 to-orange-600 hover:brightness-105 text-white font-semibold shadow-lg shadow-orange-500/25 active:scale-[0.97] transition-all duration-300 ease-out rounded-full px-5 py-2.5 text-sm focus-visible:ring-2 focus-visible:ring-orange-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950;
+        min-height: 44px;
+    }
+
+    .btn-ghost {
+        @apply text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 hover:bg-stone-900/5 dark:hover:bg-white/[0.06] active:scale-[0.97] transition-all duration-300 ease-out rounded-full px-4 py-2.5 text-sm font-medium focus-visible:ring-2 focus-visible:ring-stone-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950;
+        min-height: 44px;
+    }
+
+    .btn-outline {
+        @apply border border-stone-300 dark:border-white/[0.12] text-stone-700 dark:text-stone-300 hover:bg-stone-900/5 dark:hover:bg-white/[0.06] active:scale-[0.97] transition-all duration-300 ease-out rounded-full px-4 py-2.5 text-sm font-medium focus-visible:ring-2 focus-visible:ring-stone-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950;
+        min-height: 44px;
+    }
+
+    .btn-icon {
+        @apply inline-flex items-center justify-center rounded-full text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 hover:bg-stone-900/5 dark:hover:bg-white/[0.06] active:scale-[0.95] transition-all duration-200;
+        width: 44px;
+        height: 44px;
+    }
+
+    .notice-stack {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 65;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--notice-gap);
+        padding: 0.75rem;
+        padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+        pointer-events: none;
+    }
+
+    .notice-stack>* {
+        pointer-events: auto;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        inset: auto !important;
+        width: 100% !important;
+        max-width: 34rem;
+        margin: 0 auto;
+    }
+}
+
+@layer utilities {
+    .shadow-soft {
+        box-shadow:
+            0 10px 25px -3px rgba(0, 0, 0, 0.08),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .shadow-elevated {
+        box-shadow:
+            0 25px 50px -12px rgba(0, 0, 0, 0.12),
+            0 10px 16px -4px rgba(0, 0, 0, 0.08);
+    }
+
+    .rounded-5xl {
+        border-radius: var(--radius-hero);
+    }
+
+    @keyframes shimmer-sweep {
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    @keyframes icon-float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-2px);
+        }
+    }
+
+    @keyframes slide-down-fade {
+        from {
+            transform: translateY(-8px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .animate-icon-float {
+        animation: icon-float 3s ease-in-out infinite;
+    }
+
+    .animate-slide-down-fade {
+        animation: slide-down-fade 0.3s var(--tw-ease, ease-out);
+    }
+
+    .safe-area-bottom {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .safe-area-top {
+        padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-thin {
+        scrollbar-width: thin;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .text-hero {
+        font-size: var(--font-hero);
+        line-height: 1;
+        @apply font-bold;
+    }
+
+    .focus-ring {
+        @apply focus-visible:ring-2 focus-visible:ring-orange-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950 focus-visible:outline-none;
+    }
+
+    .min-touch {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    @media (min-width: 475px) {
+        .xs\:inline {
+            display: inline;
+        }
+
+        .xs\:grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .xs\:flex-row {
+            flex-direction: row;
+        }
+
+        .xs\:space-y-4>:not([hidden])~:not([hidden]) {
+            --tw-space-y-reverse: 0;
+            margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+            margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+        }
+
+        .xs\:flex {
+            display: flex;
+        }
+
+        .xs\:justify-start {
+            justify-content: flex-start;
+        }
+    }
+}
