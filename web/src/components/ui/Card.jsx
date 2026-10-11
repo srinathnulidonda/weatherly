@@ -3,13 +3,12 @@ import { forwardRef } from 'react';
 import { cn } from '@/lib/cn';
 
 const variantClasses = {
-    base: 'glass',
-    glass: 'glass',
-    elevated: 'glass-elevated',
-    brand: 'glass-brand',
-    active: 'glass-active',
-    metric: 'glass-metric',
-    ghost: 'bg-transparent border-0 shadow-none rounded-2xl',
+    base: 'card-base',
+    elevated: 'card-elevated',
+    brand: 'card-brand',
+    active: 'card-active',
+    metric: 'card-metric',
+    ghost: 'bg-transparent border-0 shadow-none rounded-xl',
 };
 
 const Card = forwardRef(({ className, variant = 'base', padding = true, hoverable = false, onClick, children, ...props }, ref) => {
@@ -17,13 +16,13 @@ const Card = forwardRef(({ className, variant = 'base', padding = true, hoverabl
         <div
             ref={ref}
             className={cn(
-                'transition-all duration-300 ease-out',
+                'transition-all duration-200 ease-in-out',
                 variantClasses[variant] || variantClasses.base,
                 padding === true && 'p-4 md:p-5',
                 padding === 'sm' && 'p-3',
                 padding === 'lg' && 'p-5 md:p-6',
                 padding === false && '',
-                hoverable && 'cursor-pointer hover:border-white/[0.10] hover:-translate-y-[1px]',
+                hoverable && 'cursor-pointer hover:border-stone-200/20 dark:hover:border-stone-700/20 hover:-translate-y-[1px]',
                 onClick && 'cursor-pointer',
                 className
             )}
@@ -42,7 +41,7 @@ Card.displayName = 'Card';
 
 function CardHeader({ className, children, ...props }) {
     return (
-        <div className={cn('flex items-center justify-between mb-3', className)} {...props}>
+        <div className={cn('flex items-center justify-between mb-4', className)} {...props}>
             {children}
         </div>
     );
@@ -50,7 +49,7 @@ function CardHeader({ className, children, ...props }) {
 
 function CardTitle({ className, children, ...props }) {
     return (
-        <h3 className={cn('card-heading', className)} {...props}>
+        <h3 className={cn('text-lg font-semibold text-stone-900 dark:text-stone-100', className)} {...props}>
             {children}
         </h3>
     );

@@ -1,7 +1,10 @@
 # backend/app/utils/http.py
 import asyncio
+
 import httpx
+
 from app.config import get_settings
+
 
 class HTTPClient:
     _instance: "HTTPClient | None" = None
@@ -28,9 +31,11 @@ class HTTPClient:
         return self._client
 
     async def close(self) -> None:
-        if self._client:
-            await self._client.aclose()
-            self._client = None
+        client = self._client
+        self._client = None
+        self._lock = None
+        if client is not None:
+            await client.aclose()
 
 
 http_client = HTTPClient()

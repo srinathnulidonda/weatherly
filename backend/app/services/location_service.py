@@ -1,9 +1,9 @@
 # backend/app/services/location_service.py
+import ipaddress
 import logging
 from typing import Any
 from uuid import UUID
 
-import httpx
 from sqlalchemy import func as sa_func
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +17,10 @@ from app.schemas.location import (
     IPLocationResponse, LocationResponse, LocationSummary,
 )
 from app.services.cache_service import CacheKeyBuilder, cache_service
-from app.utils import bounding_box, haversine_distance, is_private_ip, validate_coordinate_pair, validate_query_string
+from app.utils import (
+    bounding_box, get_http_client, haversine_distance, is_private_ip,
+    validate_coordinate_pair, validate_query_string,
+)
 
 logger = logging.getLogger("weatherly.location_service")
 
@@ -25,16 +28,6 @@ logger = logging.getLogger("weatherly.location_service")
 def _format_address(city: str | None, state: str | None, country: str | None) -> str:
     parts = [p for p in (city, state, country) if p]
     return ", ".join(parts) if parts else "Unknown Location"
-
-
-def _parse_ipapi(data: dict) -> dict | None:
-    if data.get("status") != "success":
-        return None
-    return {
-        "latitude": data.get("lat"), "longitude": data.get("lon"), "city": data.get("city"),
-        "region": data.get("regionName"), "country": data.get("country"),
-        "country_code": data.get("countryCode"), "timezone": data.get("timezone"), "isp": data.get("isp"),
-    }
 
 
 def _parse_ipwhois(data: dict) -> dict | None:
@@ -70,21 +63,20 @@ def _parse_ipinfo(data: dict) -> dict | None:
 
 async def _fetch_ip_location(ip: str) -> dict[str, Any] | None:
     sources = [
-        ("ip-api", f"http://ip-api.com/json/{ip}?fields=status,country,countryCode,region,regionName,city,lat,lon,timezone,isp", _parse_ipapi),
         ("ipwhois", f"https://ipwho.is/{ip}", _parse_ipwhois),
         ("ipinfo", f"https://ipinfo.io/{ip}/json", _parse_ipinfo),
     ]
-    async with httpx.AsyncClient(timeout=5.0) as client:
-        for name, url, parser in sources:
-            try:
-                resp = await client.get(url)
-                if resp.status_code == 200:
-                    parsed = parser(resp.json())
-                    if parsed and parsed.get("latitude") is not None:
-                        parsed["provider"] = name
-                        return parsed
-            except Exception as exc:
-                logger.debug("IP geo %s failed for %s: %s", name, ip, exc)
+    client = await get_http_client()
+    for name, url, parser in sources:
+        try:
+            resp = await client.get(url, timeout=5.0)
+            if resp.status_code == 200:
+                parsed = parser(resp.json())
+                if parsed and parsed.get("latitude") is not None:
+                    parsed["provider"] = name
+                    return parsed
+        except Exception as exc:
+            logger.debug("IP geo %s failed for %s: %s", name, ip, exc)
     return None
 
 
@@ -111,10 +103,10 @@ class CityGeocoder:
         return result
 
     async def _geocode_via_providers(self, query: str, target_city: str, country_code: str | None) -> dict[str, Any] | None:
-        from app.providers.provider_aggregator import ProviderAggregator
+        from app.providers.provider_aggregator import get_provider_aggregator
 
         try:
-            results = await ProviderAggregator().geocode(query, limit=5, country_code=country_code)
+            results = await get_provider_aggregator().geocode(query, limit=5, country_code=country_code)
         except Exception as exc:
             logger.debug("Provider geocode failed for '%s': %s", query, exc)
             return None
@@ -135,10 +127,17 @@ class CityGeocoder:
         if country_code:
             params["countrycodes"] = country_code.lower()
         try:
-            async with httpx.AsyncClient(timeout=6.0) as client:
-                resp = await client.get("https://nominatim.openstreetmap.org/search", params=params, headers={"User-Agent": "Weatherly/1.0"})
-                if resp.status_code == 200 and resp.json():
-                    item = resp.json()[0]
+            client = await get_http_client()
+            resp = await client.get(
+                "https://nominatim.openstreetmap.org/search",
+                params=params,
+                headers={"User-Agent": "Weatherly/1.0"},
+                timeout=6.0,
+            )
+            if resp.status_code == 200:
+                payload = resp.json()
+                if payload:
+                    item = payload[0]
                     addr = item.get("address", {})
                     city = addr.get("city") or addr.get("town") or addr.get("village") or addr.get("municipality")
                     return {
@@ -205,6 +204,11 @@ class LocationResolver:
         )
 
     async def _resolve_ip(self, ip: str) -> AutoDetectResponse:
+        try:
+            ipaddress.ip_address(ip)
+        except ValueError:
+            raise BadRequestException(f"Invalid IP address: {ip}")
+
         if is_private_ip(ip):
             raise GeocodingException(f"Cannot geolocate private/local IP address: {ip}.")
 
@@ -274,28 +278,33 @@ class LocationResolver:
     async def _reverse_nominatim(self, lat: float, lon: float) -> dict[str, Any] | None:
         params = {"lat": lat, "lon": lon, "format": "json", "addressdetails": 1, "zoom": 14}
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
-                resp = await client.get("https://nominatim.openstreetmap.org/reverse", params=params, headers={"User-Agent": "Weatherly/1.0"})
-                if resp.status_code == 200:
-                    body = resp.json()
-                    address = body.get("address", {})
-                    city = address.get("city") or address.get("town") or address.get("village") or address.get("suburb")
-                    return {
-                        "city": city, "state": address.get("state") or address.get("province"),
-                        "country": address.get("country"), "country_code": (address.get("country_code") or "").upper(),
-                        "formatted_address": body.get("display_name"),
-                        "neighborhood": address.get("suburb") or address.get("neighbourhood"),
-                        "postal_code": address.get("postcode"), "provider": "nominatim",
-                    }
+            client = await get_http_client()
+            resp = await client.get(
+                "https://nominatim.openstreetmap.org/reverse",
+                params=params,
+                headers={"User-Agent": "Weatherly/1.0"},
+                timeout=5.0,
+            )
+            if resp.status_code == 200:
+                body = resp.json()
+                address = body.get("address", {})
+                city = address.get("city") or address.get("town") or address.get("village") or address.get("suburb")
+                return {
+                    "city": city, "state": address.get("state") or address.get("province"),
+                    "country": address.get("country"), "country_code": (address.get("country_code") or "").upper(),
+                    "formatted_address": body.get("display_name"),
+                    "neighborhood": address.get("suburb") or address.get("neighbourhood"),
+                    "postal_code": address.get("postcode"), "provider": "nominatim",
+                }
         except Exception as exc:
             logger.debug("Nominatim reverse geocode failed: %s", exc)
         return None
 
     async def _reverse_owm(self, lat: float, lon: float) -> dict[str, Any] | None:
-        from app.providers.provider_aggregator import ProviderAggregator
+        from app.providers.provider_aggregator import get_provider_aggregator
 
         try:
-            result = await ProviderAggregator().reverse_geocode(lat, lon)
+            result = await get_provider_aggregator().reverse_geocode(lat, lon)
             if result and result.get("name"):
                 return {
                     "city": result.get("name"), "state": result.get("state"),
@@ -425,10 +434,10 @@ class LocationService:
         return [LocationSummary.model_validate(loc) for dist, loc in nearby if dist <= radius_km][:limit]
 
     async def _geocode_via_provider(self, query: str, limit: int, country_code: str | None) -> list[GeocodingResult]:
-        from app.providers.provider_aggregator import ProviderAggregator
+        from app.providers.provider_aggregator import get_provider_aggregator
 
         try:
-            results = await ProviderAggregator().geocode(query, limit, country_code)
+            results = await get_provider_aggregator().geocode(query, limit, country_code)
             return [
                 GeocodingResult(
                     name=r.get("name", query), latitude=r["latitude"], longitude=r["longitude"],

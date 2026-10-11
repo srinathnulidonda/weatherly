@@ -1,11 +1,17 @@
 # backend/app/core/dependencies.py
+import hmac
+import logging
 from typing import AsyncGenerator
 
 from fastapi import HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.database import DatabaseManager
+from app.core.exceptions import RateLimitExceededException
+from app.database import DatabaseManager, RedisManager
+from app.utils.rate_limit import check_rate_limit, get_client_identifier
+
+logger = logging.getLogger("weatherly.dependencies")
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -43,6 +49,31 @@ async def get_api_key(request: Request) -> str | None:
     api_key = request.headers.get("X-API-KEY")
     if not api_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing API key")
-    if api_key != settings.API_KEY:
+    if not hmac.compare_digest(api_key, settings.API_KEY):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API key")
     return api_key
+
+
+async def app_update_rate_limit(request: Request) -> None:
+    settings = get_settings()
+    limit = settings.APP_UPDATE_RATE_LIMIT_PER_MINUTE
+    if limit <= 0:
+        return
+    try:
+        redis = RedisManager.get_client()
+    except RuntimeError:
+        return
+    identifier = await get_client_identifier(request)
+    try:
+        allowed, _, ttl = await check_rate_limit(
+            redis_client=redis,
+            identifier=identifier,
+            key_suffix="app_update",
+            limit=limit,
+            window_seconds=60,
+        )
+    except Exception as exc:
+        logger.warning("App update rate limit skipped: %s", exc)
+        return
+    if not allowed:
+        raise RateLimitExceededException(retry_after=max(ttl, 1))

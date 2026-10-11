@@ -3,16 +3,18 @@ import { forwardRef } from 'react';
 import { cn } from '@/lib/cn';
 
 const variantClasses = {
-    primary: 'btn-primary',
-    ghost: 'btn-ghost',
-    outline: 'btn-outline',
-    danger: 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/25 active:scale-[0.97] transition-all duration-300 ease-out rounded-full px-4 py-2.5 text-sm font-medium focus-visible:ring-2 focus-visible:ring-red-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 dark:focus-visible:ring-offset-stone-950',
-    icon: 'min-touch inline-flex items-center justify-center rounded-full text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 hover:bg-stone-900/5 dark:hover:bg-white/[0.06] active:scale-[0.95] transition-all duration-200',
+    primary: 'bg-stone-900 text-stone-50 hover:bg-stone-800/90 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-200/90',
+    secondary: 'bg-stone-200 text-stone-900 hover:bg-stone-300/90 dark:bg-stone-800 dark:text-stone-50 dark:hover:bg-stone-700/90',
+    ghost: 'hover:bg-stone-200/50 dark:hover:bg-stone-700/50',
+    outline: 'border border-stone-300 hover:border-stone-400 dark:border-stone-600 dark:hover:border-stone-500',
+    danger: 'bg-red-600 text-stone-50 hover:bg-red-500/90 dark:bg-red-400 dark:text-stone-900 dark:hover:bg-red-300/90',
+    icon: 'min-touch inline-flex items-center justify-center rounded-full text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-700/50',
 };
 
 const sizeClasses = {
-    sm: 'text-xs px-3.5 py-1.5 min-h-[44px]',
-    md: '',
+    sm: 'text-xs px-3 py-2 min-h-[40px]',
+    md: 'text-sm px-4 py-2.5 min-h-[44px]',
+    lg: 'text-base px-5 py-3 min-h-[48px]',
 };
 
 const Button = forwardRef(({ className, variant = 'primary', size = 'md', disabled = false, loading = false, children, ...props }, ref) => {
@@ -20,9 +22,9 @@ const Button = forwardRef(({ className, variant = 'primary', size = 'md', disabl
         <button
             ref={ref}
             className={cn(
-                'inline-flex items-center justify-center gap-2 font-medium select-none',
+                'inline-flex items-center justify-center gap-2 font-medium select-none transition-all duration-200',
                 variantClasses[variant],
-                variant !== 'icon' && sizeClasses[size],
+                sizeClasses[size],
                 disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
                 loading && 'opacity-70 cursor-wait',
                 className

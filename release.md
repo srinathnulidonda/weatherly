@@ -1,281 +1,204 @@
-# 🚀 Release Notes - Weatherly v1.0.0
+# Release Notes
 
-<div align="center">
+Narrative notes for each version. For the exhaustive list of changes, see [CHANGELOG.md](CHANGELOG.md).
 
-![Release Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)
-![Release Date](https://img.shields.io/badge/Released-January_2025-green?style=for-the-badge)
-![Platform](https://img.shields.io/badge/Platform-Web_%7C_Android-orange?style=for-the-badge)
-
-### 🎉 **Major Release - Full Platform Launch**
-
-*The complete weather experience across web and mobile platforms*
-
-</div>
+**[v2.0.0 — current](#v200)** · [v1.0.0 — legacy](#v100)
 
 ---
 
-## 📦 Download Links
+## v2.0.0
 
 <div align="center">
 
-| Platform | Download | Size | Requirements |
-|----------|----------|------|--------------|
-| 🌐 **Web App** | [Launch Website](https://weatherly-appnow.vercel.app/) | - | Modern Browser |
-| 📱 **Android APK** | [Download v1.0.0](https://drive.google.com/uc?export=download&id=10lPOkrf2HACA6ht-cirq_ubcW6adB_W2
-) | ~25MB | Android 5.0+ |
-| 🍎 **iOS** | Coming Soon | - | iOS 12.0+ |
+![Version](https://img.shields.io/badge/Version-2.0.0-2563eb?style=for-the-badge)
+![Released](https://img.shields.io/badge/Released-October_11,_2026-16a34a?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-Web_%7C_Android-f97316?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Stable-success?style=for-the-badge)
+
+### Full rewrite — multi-provider weather intelligence
+
+*A rebuilt stack: new backend, new web app, new mobile app.*
 
 </div>
 
----
+### Download
 
-## ✨ What's New in v1.0.0
+| Platform | Get it | Details |
+|:---------|:-------|:--------|
+| 🌐 **Web app** | [getweatherly.vercel.app](https://getweatherly.vercel.app) | Any modern browser |
+| 📱 **Android** | [Download page](https://getweatherly.vercel.app/apk) · [APK](https://getweatherly.vercel.app/apk/releases/weatherly-2.0.0.apk) | ~19 MB · Android 6.0+ · SHA-256 on the download page |
 
-### 🎨 **User Interface & Experience**
+<details>
+<summary><b>Installing the APK</b></summary>
+
+1. Open the [download page](https://getweatherly.vercel.app/apk) on your phone and tap **Download APK**.
+2. When Android asks, allow installs from your browser (one-time permission).
+3. Open the downloaded file and confirm. If Play Protect warns about an app from outside the Play Store, choose **Install anyway**.
+4. Optional: compare the file's SHA-256 with the checksum on the download page.
+
+</details>
+
+### Highlights
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
-#### 🌐 **Web Application**
-- ✅ **Glassmorphism Design** - Modern UI with blur effects
-- ✅ **Responsive Layout** - Perfect on all screen sizes
-- ✅ **Dynamic Theming** - Changes with weather and time
-- ✅ **Progressive Web App** - Install as native app
-- ✅ **Offline Support** - Works without internet
-- ✅ **Touch Gestures** - Pull-to-refresh and swipe actions
+**🔁 Six providers, one API**<br>
+<sub>Open-Meteo, NOAA, OpenWeatherMap, WeatherAPI, Tomorrow.io and Copernicus, with automatic failover when one is down.</sub>
+
+**⚡ Fast by design**<br>
+<sub>Redis caching targets sub-50 ms cached responses, and Celery workers keep the hot set warm.</sub>
+
+**🧠 Analytics engine**<br>
+<sub>Trends, activity indices, condition insights, location comparison and alert statistics.</sub>
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
-#### 📱 **Mobile Application**
-- ✅ **Native Performance** - Smooth 60fps animations
-- ✅ **Material Design 3** - Latest Android design language
-- ✅ **Splash Screen** - Beautiful app launch experience
-- ✅ **Deep Linking** - Share specific weather locations
-- ✅ **Background Updates** - Weather data when app is closed
-- ✅ **Haptic Feedback** - Tactile response for interactions
+**🎨 Two dynamic sky engines**<br>
+<sub>CSS gradient stops on the web, a custom painter on mobile. Both follow the real solar arc and current conditions.</sub>
+
+**🔄 In-app Android updates**<br>
+<sub>The app finds new releases itself, downloads the APK and verifies its SHA-256 before opening the installer.</sub>
+
+**🚀 Smooth at 60 fps**<br>
+<sub>Static sky painter, scroll-aware animation tickers, isolated repaint layers and no nested scroll views.</sub>
 
 </td>
 </tr>
 </table>
 
-### 🌤️ **Weather Features**
-
-#### 🔍 **Smart Location Services**
-- 🎯 **GPS Integration** - Automatic location detection
-- 🌍 **Global Search** - 200,000+ cities worldwide
-- 📍 **Saved Locations** - Quick access to favorite places
-- 🔄 **Recent Searches** - Easily revisit searched locations
-
-#### 📊 **Comprehensive Weather Data**
-- 🌡️ **Current Conditions** - Real-time temperature and conditions
-- 📈 **24-Hour Forecast** - Hourly weather predictions
-- 📅 **7-Day Forecast** - Extended weather planning
-- 🌪️ **Weather Details** - Humidity, pressure, wind, UV index
-- 🌅 **Astronomical Data** - Sunrise and sunset times
-
-#### 🎭 **Dynamic Weather Effects**
-- 🌧️ **Rain Animation** - Realistic raindrops with physics
-- ❄️ **Snow Effects** - Swaying snowflakes with rotation
-- ⛈️ **Thunder & Lightning** - Dramatic storm visualization
-- 🌫️ **Fog & Mist** - Atmospheric blur effects
-- ☁️ **Moving Clouds** - Drifting cloud formations
-
-### 🔧 **Technical Improvements**
-
-#### ⚡ **Performance**
-- 🚀 **Fast Loading** - Optimized API calls and caching
-- 📱 **Efficient Animations** - Hardware-accelerated effects
-- 💾 **Smart Caching** - Reduced data usage
-- 🔄 **Background Sync** - Updates without user action
-
-#### 🛡️ **Reliability**
-- 🛠️ **Error Handling** - Graceful failure recovery
-- 🔒 **Data Validation** - Robust input sanitization
-- 📊 **Rate Limiting** - API usage optimization
-- 🔄 **Retry Logic** - Automatic recovery from failures
-
----
-
-## 🛠️ Technical Specifications
-
-### 🏗️ **Architecture**
+### In-app updates
 
 ```mermaid
-graph TD
-    A[Web Frontend] --> D[Load Balancer]
-    B[Mobile App] --> D
-    C[Future Platforms] --> D
-    D --> E[Flask API Server]
-    E --> F[OpenWeatherMap API]
-    E --> G[Redis Cache]
-    E --> H[Rate Limiter]
-    
-    style A fill:#3b82f6
-    style B fill:#06b6d4
-    style E fill:#ef4444
-    style F fill:#f59e0b
+sequenceDiagram
+    participant App as Android app
+    participant API as Backend
+    participant Site as Website
+    App->>API: GET /api/v1/app/version
+    API-->>App: version, APK URL, SHA-256, size, changelog
+    App->>Site: Download APK over HTTPS
+    App->>App: Verify SHA-256
+    App->>App: Open the system installer
 ```
 
-### 📊 **Performance Metrics**
+- The app checks once per launch, after the splash screen.
+- **Later** skips that release. The prompt returns with the next one.
+- Updates can be made mandatory with a minimum version or a force flag on the backend.
+- Android only installs an update that is signed with the same key as the installed app. Always sign releases with the same keystore.
 
-| Metric | Web App | Mobile App | API |
-|--------|---------|------------|-----|
-| **Load Time** | < 2s | < 1s | < 200ms |
-| **Bundle Size** | 2.5MB | 25MB | - |
-| **API Calls/Min** | 30 | Unlimited | 1000 |
-| **Offline Support** | ✅ Yes | ✅ Yes | - |
-| **Cache Duration** | 5 min | 10 min | 5 min |
+### What's new
 
-### 🌐 **Browser Support**
+**Backend** — Flask → FastAPI. Multi-provider aggregation with failover, a full analytics API, air quality, astronomy, map tiles, marine and environmental data, Celery workers, observability and security middleware, and the update manifest.
 
-| Browser | Minimum Version | Status |
-|---------|----------------|--------|
-| Chrome | 90+ | ✅ Fully Supported |
-| Firefox | 88+ | ✅ Fully Supported |
-| Safari | 14+ | ✅ Fully Supported |
-| Edge | 90+ | ✅ Fully Supported |
-| Opera | 76+ | ✅ Fully Supported |
+**Web** — Vanilla JS → React. Zustand and React Query state, DynamicSky, drag-to-reorder location pager, Analytics and Alerts pages, legal pages, error boundaries, skeleton loaders, offline banner, and the Android download and release-history pages.
 
-### 📱 **Mobile Compatibility**
+**Mobile** — A new Flutter app. Provider architecture, custom-painted charts (temperature, AQI gauge, wind compass, sun arc), alert radar, a 14-rule smart advisory engine, animated splash, bottom navigation and tablet sidebar, offline last-known weather, and in-app updates.
 
-| Platform | Minimum Version | Status |
-|----------|----------------|--------|
-| Android | 5.0 (API 21) | ✅ Fully Supported |
-| iOS | 12.0+ | 🔄 Coming Soon |
-| iPadOS | 13.0+ | 🔄 Coming Soon |
+### API at a glance
 
----
+All endpoints live under `/api/v1`.
 
-## 🔧 Installation Guide
+| Area | Endpoints |
+|:-----|:----------|
+| **Weather** | `/weather/current` · `/weather/forecast` (1–16 days, optional hourly) · `/weather/history` (30 days) · `/weather/alerts` · `/weather/air-quality` · `/weather/maps` · `/weather/astronomy` |
+| **Analytics** | `/analytics/trends` (1–168 h) · `/analytics/compare` (2–5 locations) · `/analytics/indices` · `/analytics/insights` · `/analytics/alert-stats` |
+| **Marine** | `/marine/ocean` · `/marine/tides` · `/marine/agriculture` · `/marine/environmental` |
+| **Locations** | `/locations/search` |
+| **App** | `/app/version` |
+| **System** | `/health` · `/health/detailed` and `/metrics` (API key) |
 
-### 🌐 **Web Application**
+### Breaking changes
 
-**Option 1: Direct Access**
-1. Visit [weatherly-appnow.vercel.app](https://weatherly-appnow.vercel.app/)
-2. Allow location access for better experience
-3. Start exploring weather data!
+**Backend**
 
-**Option 2: Install as PWA**
-1. Open the website in Chrome/Edge
-2. Click the "Install" button in the address bar
-3. Add to home screen for native app experience
+- Flask → FastAPI. All endpoints now live under `/api/v1`.
+- Successful responses use a `data` envelope with a `message`. Errors are `{ "error": true, "error_code": "...", "message": "...", "details": {...} }`.
+- Alerts are paginated, and the response includes a `pagination` object.
+- Rate limiting is now one per-IP limit, configurable with `RATE_LIMIT_PER_MINUTE` (default 120). It replaces the per-endpoint limits of 30 / 20 / 10.
+- `/api/v1/weather/{city}` is removed. Search with `/api/v1/locations/search?q=...`, then call `/api/v1/weather/current?lat=...&lon=...`.
 
-### 📱 **Mobile Application (Android)**
+**Web**
 
-**Prerequisites:**
-- Android 5.0 or higher
-- 50MB free storage space
-- Internet connection for initial setup
+- The app is now a single-page app. Routes are `/`, `/forecast`, `/search`, `/analytics`, `/alerts`, `/settings`, `/apk` and `/legal/*`. Old multi-page URLs such as `/about.html` are gone.
+- Preferences stored under the v1.0.0 localStorage keys are ignored, so users start fresh.
 
-**Installation Steps:**
-1. Download APK from [this link](https://drive.google.com/uc?export=download&id=10lPOkrf2HACA6ht-cirq_ubcW6adB_W2
-)
-2. Enable "Install from Unknown Sources" in Settings
-3. Open the downloaded APK file
-4. Follow installation prompts
-5. Grant location permissions for best experience
+**Mobile**
 
-**Security Note:** The APK is signed and verified safe. Your browser may show a warning for unrecognized downloads - this is normal for direct APK downloads.
+- The package ID changed from `com.example.weather` to `com.sn.weatherly`. Android treats it as a different app, so v1.0.0 users must install v2.0.0 fresh. Their saved data does not carry over.
+- The v1.0.0 screens (`splash_screen`, `home_screen`, `settings_screen`, `about_screen`) and the local notification manager are removed. Alerts now appear in the Alerts page and the home-screen banner.
 
----
+<details>
+<summary><b>Migration guide</b></summary>
 
-## 🆘 Support & Feedback
+#### Calling the v1.0.0 API
 
-### 💬 **Get Help**
+| v1.0.0 | v2.0.0 |
+|:-------|:-------|
+| `GET /api/v1/weather/London` | `GET /api/v1/locations/search?q=London`, then `GET /api/v1/weather/current?lat=…&lon=…` |
+| `GET /api/v1/weather/coordinates?lat=X&lon=Y` | `GET /api/v1/weather/current?lat=X&lon=Y` |
+| `GET /api/v1/forecast/London` | `GET /api/v1/weather/forecast?lat=X&lon=Y&days=7` |
+| `POST /api/v1/weather/bulk` | Loop over `/weather/current`, or use `/analytics/compare` |
+| `Authorization: Bearer …` | `X-API-KEY: …` (only enforced when the `API_KEY` environment variable is set) |
 
-<div align="center">
+#### Running the stacks
 
-[![Documentation](https://img.shields.io/badge/📚_Documentation-Read-blue?style=for-the-badge)](README.md)
-[![Issues](https://img.shields.io/badge/🐛_Report_Bug-GitHub-red?style=for-the-badge)](https://github.com/srinathnulidonda/weatherly/issues)
-[![Feature Request](https://img.shields.io/badge/💡_Feature_Request-GitHub-green?style=for-the-badge)](https://github.com/srinathnulidonda/weatherly/issues)
-[![Email Support](https://img.shields.io/badge/📧_Email_Support-Contact-orange?style=for-the-badge)](mailto:srinathnulidonda.dev@gmail.com)
+The v1.0.0 sources are preserved under the `v1.0.0` tag.
 
-</div>
+```bash
+git checkout v1.0.0     # the old Flask stack
+git checkout main       # v2.0.0
+docker-compose up -d
+```
 
-### 📊 **Report Issues**
+#### Production configuration
 
-**Before reporting:**
-1. Check existing [GitHub Issues](https://github.com/srinathnulidonda/weatherly/issues)
-2. Update to the latest version
-3. Clear browser cache (for web app)
+With `ENVIRONMENT=production` the backend refuses to start unless `API_KEY` is set, `ALLOWED_HOSTS` lists explicit hostnames, and `CORS_ORIGINS` is not `*`.
 
-**When reporting:**
-- 📱 Device/Browser information
-- 🔍 Steps to reproduce
-- 📸 Screenshots if applicable
-- 🌍 Location where issue occurred
+</details>
 
----
+### Performance targets
 
-## 🙏 Credits & Acknowledgments
+| Metric | Web | Mobile | Backend |
+|:-------|:----|:-------|:--------|
+| First contentful paint | < 1.2 s | — | — |
+| App launch | — | < 2 s | — |
+| Time to first weather | < 1.5 s | < 3 s | — |
+| Cached API response | — | — | < 50 ms |
+| Uncached API response | — | — | < 500 ms |
+| Frame budget | 16 ms | 16 ms | — |
+| Cache hit rate | — | — | ≥ 85 % |
+| APK size | — | ~19 MB | — |
 
-### 🌟 **Special Thanks**
+### Known limitations
 
-<table>
-<tr>
-<td align="center" width="25%">
-<img src="https://openweathermap.org/themes/openweathermap/assets/img/logo_white_cropped.png" width="100" alt="OpenWeatherMap"><br>
-<sub><b>OpenWeatherMap</b></sub><br>
-<sub>Weather Data Provider</sub>
-</td>
-<td align="center" width="25%">
-<img src="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_light_background.png" width="100" alt="Vercel"><br>
-<sub><b>Vercel</b></sub><br>
-<sub>Web Hosting</sub>
-</td>
-<td align="center" width="25%">
-<img src="https://render.com/icons/icon-512x512.png" width="100" alt="Render"><br>
-<sub><b>Render</b></sub><br>
-<sub>API Hosting</sub>
-</td>
-<td align="center" width="25%">
-<img src="https://cdn.worldvectorlogo.com/logos/flutter-logo.svg" width="100" alt="Flutter"><br>
-<sub><b>Flutter Team</b></sub><br>
-<sub>Mobile Framework</sub>
-</td>
-</tr>
-</table>
+- Android only. There is no iOS build.
+- The APK is distributed outside the Play Store, so Play Protect may show a warning on first install.
 
-### 🛠️ **Built With**
-- 🐍 **Flask** - Backend API framework
-- 🌐 **Vanilla JS** - Frontend without heavy frameworks
-- 📱 **Flutter** - Cross-platform mobile development
-- 🎨 **CSS3** - Modern styling with glassmorphism
-- ☁️ **OpenWeatherMap** - Reliable weather data
+[Report a bug](https://github.com/srinathnulidonda/weatherly/issues) · [Request a feature](https://github.com/srinathnulidonda/weatherly/issues) · [Email](mailto:srinathnulidonda.dev@gmail.com)
+
+**[⬆ Back to top](#release-notes)**
 
 ---
 
-## 📄 License & Legal
+## v1.0.0
 
-<div align="center">
+> **Superseded by [v2.0.0](#v200).** Kept for reference. The `v1.0.0` tag preserves the original Flask backend, vanilla JS web app and first Flutter app.
 
-**MIT License** © 2025 Srinath Nulidonda
+![Version](https://img.shields.io/badge/Version-1.0.0-2563eb?style=flat-square)
+![Released](https://img.shields.io/badge/Released-October_8,_2025-16a34a?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Legacy-lightgrey?style=flat-square)
 
-*This software is provided "as is", without warranty of any kind.*
+*Initial public release: the first weather experience across web and mobile.*
 
-[![License](https://img.shields.io/badge/📄_View_License-MIT-green?style=for-the-badge)](LICENSE)
+| Platform | Link | Size |
+|:---------|:-----|:-----|
+| 🌐 Web | [getweatherly.vercel.app](https://getweatherly.vercel.app/) | — |
+| 📱 Android | [APK v1.0.0](https://drive.google.com/uc?export=download&id=10lPOkrf2HACA6ht-cirq_ubcW6adB_W2) | ~50 MB |
 
-**Weather data provided by OpenWeatherMap under their terms of service.*
+What shipped and the limitations that v2.0.0 addresses are listed under [1.0.0 in the changelog](CHANGELOG.md#100--2025-10-08-legacy). To move to v2.0.0, follow the [migration guide](#v200).
 
-</div>
+**[⬆ Back to top](#release-notes)**
 
----
-
-<div align="center">
-
-### 🎉 Thank you for using Weatherly!
-
-**We hope you enjoy the beautiful weather experience we've created.**
-
-[![Star on GitHub](https://img.shields.io/badge/⭐_Star_on_GitHub-Show_Support-yellow?style=for-the-badge)](https://github.com/srinathnulidonda/weatherly)
-[![Share on Twitter](https://img.shields.io/badge/🐦_Share_on_Twitter-Spread_the_Word-blue?style=for-the-badge)](https://twitter.com/intent/tweet?text=Check%20out%20Weatherly%20-%20Beautiful%20weather%20forecasts%20everywhere!&url=https://weatherly-appnow.vercel.app/)
-
----
-
-*Made with ❤️ by [Srinath Nulidonda](https://srinathnulidonda.vercel.app/)*
-
-**[⬆ Back to Top](#-release-notes---weatherly-v100)**
-
-</div>
+<sub>MIT License © 2025–2026 Srinath Nulidonda</sub>

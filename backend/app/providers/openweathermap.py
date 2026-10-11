@@ -291,7 +291,7 @@ class OpenWeatherMapProvider:
                         "gust_ms": w.get("gust"),
                     },
                     "precipitation": {
-                        "rain_1h_mm": item.get("rain", {}).get("3h"),
+                        "rain_3h_mm": item.get("rain", {}).get("3h"),
                         "probability": round(item["pop"] * 100, 1) if item.get("pop") is not None else None,
                     },
                     "condition": {

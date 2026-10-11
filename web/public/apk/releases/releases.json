@@ -5,7 +5,7 @@
             "build_number": 2,
             "apk_url": "/apk/releases/weatherly-2.0.0.apk",
             "file_size_bytes": null,
-            "released_at": null,
+            "released_at": "2026-10-11",
             "sha256": null,
             "changelog": [
                 "In-app updates with verified downloads",
@@ -18,9 +18,9 @@
         {
             "version": "1.0.0",
             "build_number": 1,
-            "apk_url": "/apk/releases/weatherly-1.0.0.apk",
+            "apk_url": "https://drive.google.com/uc?export=download&id=10lPOkrf2HACA6ht-cirq_ubcW6adB_W2",
             "file_size_bytes": null,
-            "released_at": null,
+            "released_at": "2025-10-08",
             "sha256": null,
             "changelog": [
                 "Initial release"

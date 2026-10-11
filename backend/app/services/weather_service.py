@@ -132,6 +132,7 @@ class WeatherService:
                     h.wind.gust_ms = self._conv_speed(h.wind.gust_ms, to_speed)
                 if h.precipitation:
                     h.precipitation.rain_1h_mm = self._conv_precip(h.precipitation.rain_1h_mm, to_precip)
+                    h.precipitation.rain_3h_mm = self._conv_precip(h.precipitation.rain_3h_mm, to_precip)
                     h.precipitation.snow_1h_mm = self._conv_precip(h.precipitation.snow_1h_mm, to_precip)
         return response
 
@@ -462,10 +463,10 @@ class WeatherService:
         return WeatherInsightsResponse(location=current.location, generated_at=datetime.now(timezone.utc), insights=insights)
 
     async def _fetch_from_aggregator(self, data_type: str, lat: float, lon: float, **kwargs: Any) -> dict[str, Any]:
-        from app.providers.provider_aggregator import ProviderAggregator
+        from app.providers.provider_aggregator import get_provider_aggregator
 
         try:
-            return await ProviderAggregator().fetch(data_type, lat, lon, **kwargs)
+            return await get_provider_aggregator().fetch(data_type, lat, lon, **kwargs)
         except ProviderException:
             raise
         except Exception as exc:

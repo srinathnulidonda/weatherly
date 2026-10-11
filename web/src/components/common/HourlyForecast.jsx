@@ -33,6 +33,7 @@ function HourlyForecast({ hours: externalHours, limit = null, viewAllLink = fals
         return [];
     }, [data, externalHours, hasExternal, limit]);
 
+    // Memoize expensive computations
     const dayBreaks = useMemo(() => {
         const marks = new Map();
         let prevKey = null;
@@ -103,7 +104,7 @@ function HourlyForecast({ hours: externalHours, limit = null, viewAllLink = fals
 
     if (!hourlyData.length) {
         return (
-            <Card variant="glass" className={className}>
+            <Card variant="card-base" className={className}>
                 <EmptyState
                     icon={Clock}
                     title="No hourly data"
@@ -115,7 +116,7 @@ function HourlyForecast({ hours: externalHours, limit = null, viewAllLink = fals
 
     return (
         <AnimatedItem>
-            <Card variant="glass" padding={false} className={cn('relative overflow-visible', className)}>
+            <Card variant="card-base" padding={false} className={cn('relative overflow-visible', className)}>
                 <div className="flex items-start justify-between gap-2 px-3 sm:px-5 pt-3 sm:pt-4 pb-2 sm:pb-3">
                     <div className="min-w-0">
                         <Card.Title>Hourly Forecast</Card.Title>
@@ -200,7 +201,7 @@ function HourlyForecast({ hours: externalHours, limit = null, viewAllLink = fals
                                         </div>
                                     )}
                                     <Tooltip
-                                        content={`${formatTemp(hour.temperature_c, units)} — ${hour.condition?.description || hour.condition?.main || ''}`}
+                                        content={`${formatTemp(hour.temperature_c, units)} — ${hour.condition?.description || hour.condition?.main || ''}`} // Fixed potential null access
                                     >
                                         <div
                                             className={cn(

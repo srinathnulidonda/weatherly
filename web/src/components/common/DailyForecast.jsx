@@ -35,7 +35,7 @@ function DailyForecast({ days = 7, compact = false, viewAllLink = false, classNa
 
     if (isLoading) {
         return (
-            <div className={cn('space-y-1.5 sm:space-y-2', className)}>
+            <div className={cn('space-y-1.5 sm:space-y-2', className)}>}
                 {Array.from({ length: compact ? 5 : 7 }).map((_, i) => (
                     <SkeletonRow key={i} />
                 ))}
@@ -47,8 +47,7 @@ function DailyForecast({ days = 7, compact = false, viewAllLink = false, classNa
 
     return (
         <AnimatedItem>
-            <Card variant="glass" padding={false} className={cn('overflow-hidden', className)}>
-
+            <Card variant="card-base" padding={false} className={cn('overflow-hidden', className)}>
                 <div className="flex items-center justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-3 sm:pb-4">
                     <Card.Title>{days}-Day Forecast</Card.Title>
                     {viewAllLink ? (

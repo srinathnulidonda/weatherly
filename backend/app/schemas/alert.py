@@ -6,6 +6,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
+from app.schemas.common import PaginationMeta
+
 
 class AlertResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -33,6 +35,11 @@ class AlertResponse(BaseModel):
     response_type: str | None
     created_at: datetime
     updated_at: datetime
+
+
+class AlertListData(BaseModel):
+    alerts: list[AlertResponse]
+    pagination: PaginationMeta
 
 
 class AlertStats(BaseModel):

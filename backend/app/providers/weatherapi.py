@@ -5,6 +5,7 @@ import hashlib
 import logging
 from datetime import datetime, timezone
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -13,6 +14,57 @@ from app.core.exceptions import ProviderException, ProviderTimeoutException
 from app.utils import get_http_client
 
 logger = logging.getLogger("weatherly.providers.weatherapi")
+
+
+def _zone(tz_id: str | None) -> ZoneInfo | None:
+    if not tz_id:
+        return None
+    try:
+        return ZoneInfo(tz_id)
+    except Exception:
+        return None
+
+
+def _parse_naive(text: str) -> datetime | None:
+    value = text.strip()
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d %I:%M %p"):
+        try:
+            return datetime.strptime(value, fmt)
+        except ValueError:
+            continue
+    try:
+        return datetime.fromisoformat(value).replace(tzinfo=None)
+    except ValueError:
+        return None
+
+
+def _to_utc_iso(naive: datetime | None, tz_id: str | None, fallback: str | None) -> str | None:
+    if naive is None:
+        return fallback
+    zone = _zone(tz_id)
+    if zone is None:
+        return naive.replace(tzinfo=timezone.utc).isoformat()
+    try:
+        return naive.replace(tzinfo=zone).astimezone(timezone.utc).isoformat()
+    except Exception:
+        return fallback
+
+
+def _local_iso(value: str | None, tz_id: str | None) -> str | None:
+    if not value:
+        return None
+    if value.strip().lower().startswith("no "):
+        return None
+    return _to_utc_iso(_parse_naive(value), tz_id, fallback=value)
+
+
+def _combine_iso(date_str: str | None, time_str: str | None, tz_id: str | None) -> str | None:
+    if not date_str or not time_str:
+        return None
+    if time_str.strip().lower().startswith("no "):
+        return None
+    combined = f"{date_str} {time_str.strip()}"
+    return _to_utc_iso(_parse_naive(combined), tz_id, fallback=time_str)
 
 
 class WeatherAPIProvider:
@@ -150,37 +202,15 @@ class WeatherAPIProvider:
         except Exception as exc:
             raise ProviderException(self.PROVIDER_NAME, str(exc), exc)
 
-    @staticmethod
-    def _combine_date_time(date_str: str | None, time_str: str | None) -> str | None:
-        if not date_str or not time_str:
-            return None
-        if time_str.lower().startswith("no "):
-            return None
-        try:
-            dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p")
-            return dt.isoformat()
-        except (ValueError, TypeError):
-            pass
-        try:
-            dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-            return dt.isoformat()
-        except (ValueError, TypeError):
-            pass
-        try:
-            datetime.fromisoformat(time_str)
-            return time_str
-        except (ValueError, TypeError):
-            pass
-        return time_str
-
     def _normalize_current(self, data: dict[str, Any]) -> dict[str, Any]:
         current = data.get("current", {})
         condition = current.get("condition", {})
         aqi = current.get("air_quality", {})
+        tz_id = data.get("location", {}).get("tz_id")
 
         return {
             "provider": self.PROVIDER_NAME,
-            "observed_at": current.get("last_updated"),
+            "observed_at": _local_iso(current.get("last_updated"), tz_id),
             "temperature_c": current.get("temp_c"),
             "feels_like_c": current.get("feelslike_c"),
             "humidity": current.get("humidity"),
@@ -204,6 +234,7 @@ class WeatherAPIProvider:
 
     def _normalize_forecast(self, data: dict[str, Any], hourly: bool) -> dict[str, Any]:
         forecast_days = []
+        tz_id = data.get("location", {}).get("tz_id")
 
         for day in data.get("forecast", {}).get("forecastday", []):
             day_data = day.get("day", {})
@@ -217,7 +248,7 @@ class WeatherAPIProvider:
             for h in raw_hours:
                 h_cond = h.get("condition", {})
                 hourly_items.append({
-                    "datetime_utc": h.get("time"),
+                    "datetime_utc": _local_iso(h.get("time"), tz_id),
                     "temperature_c": h.get("temp_c"),
                     "feels_like_c": h.get("feelslike_c"),
                     "humidity": h.get("humidity"),
@@ -263,10 +294,10 @@ class WeatherAPIProvider:
                 },
                 "uv_index": day_data.get("uv"),
                 "astronomy": {
-                    "sunrise": self._combine_date_time(date_str, astro.get("sunrise")),
-                    "sunset": self._combine_date_time(date_str, astro.get("sunset")),
-                    "moonrise": self._combine_date_time(date_str, astro.get("moonrise")),
-                    "moonset": self._combine_date_time(date_str, astro.get("moonset")),
+                    "sunrise": _combine_iso(date_str, astro.get("sunrise"), tz_id),
+                    "sunset": _combine_iso(date_str, astro.get("sunset"), tz_id),
+                    "moonrise": _combine_iso(date_str, astro.get("moonrise"), tz_id),
+                    "moonset": _combine_iso(date_str, astro.get("moonset"), tz_id),
                     "moon_phase": None,
                     "moon_illumination": astro.get("moon_illumination"),
                 },
@@ -297,11 +328,12 @@ class WeatherAPIProvider:
         return {"provider": self.PROVIDER_NAME, "data": days_data}
 
     def _normalize_marine(self, data: dict[str, Any]) -> dict[str, Any]:
+        tz_id = data.get("location", {}).get("tz_id")
         marine_days = []
         for day in data.get("forecast", {}).get("forecastday", []):
             for hour in day.get("hour", []):
                 marine_days.append({
-                    "datetime_utc": hour.get("time"),
+                    "datetime_utc": _local_iso(hour.get("time"), tz_id),
                     "water_temp_c": hour.get("water_temp_c"),
                     "wave_height_m": hour.get("sig_ht_mt"),
                     "swell_height_m": hour.get("swell_ht_mt"),
@@ -317,16 +349,17 @@ class WeatherAPIProvider:
 
     def _normalize_astronomy(self, data: dict[str, Any], date_str: str = "") -> dict[str, Any]:
         astro = data.get("astronomy", {}).get("astro", {})
+        location = data.get("location", {})
+        tz_id = location.get("tz_id")
         if not date_str:
-            loc = data.get("location", {})
-            date_str = loc.get("localtime", "")[:10]
+            date_str = location.get("localtime", "")[:10]
         return {
             "provider": self.PROVIDER_NAME,
             "date": date_str,
-            "sunrise": self._combine_date_time(date_str, astro.get("sunrise")) or astro.get("sunrise"),
-            "sunset": self._combine_date_time(date_str, astro.get("sunset")) or astro.get("sunset"),
-            "moonrise": self._combine_date_time(date_str, astro.get("moonrise")) or astro.get("moonrise"),
-            "moonset": self._combine_date_time(date_str, astro.get("moonset")) or astro.get("moonset"),
+            "sunrise": _combine_iso(date_str, astro.get("sunrise"), tz_id) or astro.get("sunrise"),
+            "sunset": _combine_iso(date_str, astro.get("sunset"), tz_id) or astro.get("sunset"),
+            "moonrise": _combine_iso(date_str, astro.get("moonrise"), tz_id) or astro.get("moonrise"),
+            "moonset": _combine_iso(date_str, astro.get("moonset"), tz_id) or astro.get("moonset"),
             "moon_phase": astro.get("moon_phase"),
             "moon_illumination": astro.get("moon_illumination"),
             "is_moon_up": astro.get("is_moon_up"),

@@ -209,8 +209,10 @@ def calculate_us_aqi_from_pm25(pm25: float) -> int:
         (250.5, 350.4, 301, 400), (350.5, 500.4, 401, 500),
     ]
     for bp_lo, bp_hi, aqi_lo, aqi_hi in breakpoints:
-        if bp_lo <= pm25 <= bp_hi:
-            return round(((aqi_hi - aqi_lo) / (bp_hi - bp_lo)) * (pm25 - bp_lo) + aqi_lo)
+        if pm25 <= bp_hi:
+            clamped = max(pm25, bp_lo)
+            ratio = (clamped - bp_lo) / (bp_hi - bp_lo)
+            return round(ratio * (aqi_hi - aqi_lo) + aqi_lo)
     return 500
 
 

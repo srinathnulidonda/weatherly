@@ -4,16 +4,18 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
 from sqlalchemy import text
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app import models
 from app.config import get_settings
+from app.core.dependencies import get_api_key
 from app.core.exceptions import WeatherlyException
 from app.database import DatabaseManager, RedisManager
 from app.middleware.monitoring import MetricsCollector, ObservabilityMiddleware, setup_logging
@@ -76,8 +78,9 @@ async def _lifespan(app: FastAPI):
 
 
 def _register_middleware(app: FastAPI, settings: Any) -> None:
-    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(GZipMiddleware, minimum_size=1024)
     app.add_middleware(RateLimitMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts_list or ["*"])
     app.add_middleware(
         CORSMiddleware,
@@ -98,7 +101,11 @@ def _register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
         errors = [
-            {"field": ".".join(str(loc) for loc in err.get("loc", [])), "message": err.get("msg", ""), "type": err.get("type", "")}
+            {
+                "field": ".".join(str(loc) for loc in err.get("loc", [])),
+                "message": str(err.get("msg", "")),
+                "type": str(err.get("type", "")),
+            }
             for err in exc.errors()
         ]
         return JSONResponse(
@@ -121,6 +128,7 @@ def _register_exception_handlers(app: FastAPI) -> None:
 
 def _register_routers(app: FastAPI) -> None:
     from app.api.analytics import router as analytics_router
+    from app.api.app_version import router as app_version_router
     from app.api.locations import router as locations_router
     from app.api.marine import router as marine_router
     from app.api.weather import router as weather_router
@@ -130,6 +138,7 @@ def _register_routers(app: FastAPI) -> None:
     app.include_router(locations_router, prefix=prefix)
     app.include_router(marine_router, prefix=prefix)
     app.include_router(analytics_router, prefix=prefix)
+    app.include_router(app_version_router, prefix=prefix)
 
 
 def _register_health_routes(app: FastAPI, settings: Any) -> None:
@@ -167,13 +176,13 @@ def _register_health_routes(app: FastAPI, settings: Any) -> None:
             },
         )
 
-    @app.get("/health/detailed", tags=["System"])
+    @app.get("/health/detailed", tags=["System"], dependencies=[Depends(get_api_key)])
     async def detailed_health():
-        from app.providers.provider_aggregator import ProviderAggregator
+        from app.providers.provider_aggregator import get_provider_aggregator
         from app.services.cache_service import cache_service
 
         try:
-            providers = await ProviderAggregator().health_check_all()
+            providers = await get_provider_aggregator().health_check_all()
         except Exception:
             providers = {}
         try:
@@ -183,6 +192,6 @@ def _register_health_routes(app: FastAPI, settings: Any) -> None:
 
         return {"metrics": MetricsCollector.get().summary(), "providers": providers, "cache": cache_stats}
 
-    @app.get("/metrics", tags=["System"])
+    @app.get("/metrics", tags=["System"], dependencies=[Depends(get_api_key)])
     async def get_metrics():
         return MetricsCollector.get().summary()

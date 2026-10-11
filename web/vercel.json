@@ -1,0 +1,28 @@
+{
+    "rewrites": [
+        {
+            "source": "/((?!apk/releases/.+\\..+).*)",
+            "destination": "/index.html"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/apk/releases/releases.json",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/apk/releases/(.*)\\.apk",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/vnd.android.package-archive"
+                }
+            ]
+        }
+    ]
+}

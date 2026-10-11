@@ -81,7 +81,10 @@ class DatabaseManager:
         if cls._engine is None:
             raise RuntimeError("DatabaseManager is not initialized")
         async with cls._engine.begin() as conn:
-            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+            try:
+                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+            except Exception as exc:
+                logger.warning("pg_trgm extension unavailable: %s", exc)
             await conn.run_sync(Base.metadata.create_all)
             logger.info("Database tables created successfully")
 

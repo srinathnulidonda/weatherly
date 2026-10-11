@@ -334,3 +334,13 @@ class ProviderAggregator:
             return await coro_func(*args, **kwargs)
         except Exception as exc:
             return exc
+
+
+_aggregator: ProviderAggregator | None = None
+
+
+def get_provider_aggregator() -> ProviderAggregator:
+    global _aggregator
+    if _aggregator is None:
+        _aggregator = ProviderAggregator()
+    return _aggregator

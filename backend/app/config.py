@@ -2,7 +2,7 @@
 from functools import lru_cache
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,14 +19,14 @@ class Settings(BaseSettings):
     ENVIRONMENT: str
 
     DATABASE_URL: str
-    DB_POOL_SIZE: int
-    DB_MAX_OVERFLOW: int
-    DB_POOL_TIMEOUT: int
-    DB_POOL_RECYCLE: int
-    DB_ECHO: bool
+    DB_POOL_SIZE: int = Field(default=5, ge=1, le=50)
+    DB_MAX_OVERFLOW: int = Field(default=10, ge=0, le=100)
+    DB_POOL_TIMEOUT: int = Field(default=30, ge=1, le=300)
+    DB_POOL_RECYCLE: int = Field(default=1800, ge=60, le=86400)
+    DB_ECHO: bool = False
 
     REDIS_URL: str
-    REDIS_MAX_CONNECTIONS: int
+    REDIS_MAX_CONNECTIONS: int = Field(default=20, ge=1, le=500)
 
     OPENWEATHERMAP_API_KEY: str = ""
     OPENWEATHERMAP_BASE_URL: str = "https://api.openweathermap.org"
@@ -41,26 +41,37 @@ class Settings(BaseSettings):
     OPEN_METEO_BASE_URL: str = "https://api.open-meteo.com"
 
     CORS_ORIGINS: str
+    RATE_LIMIT_PER_MINUTE: int = Field(default=120, ge=1, le=10000)
 
-    RATE_LIMIT_PER_MINUTE: int
+    CACHE_TTL_CURRENT: int = Field(default=300, ge=1)
+    CACHE_TTL_FORECAST: int = Field(default=1800, ge=1)
+    CACHE_TTL_LOCATION: int = Field(default=86400, ge=1)
+    CACHE_TTL_ALERTS: int = Field(default=60, ge=1)
 
-    CACHE_TTL_CURRENT: int
-    CACHE_TTL_FORECAST: int
-    CACHE_TTL_LOCATION: int
-    CACHE_TTL_ALERTS: int
-
-    HTTP_TIMEOUT: float = 30.0
-    HTTP_TIMEOUT_CONNECT: float = 10.0
+    HTTP_TIMEOUT: float = Field(default=30.0, gt=0)
+    HTTP_TIMEOUT_CONNECT: float = Field(default=10.0, gt=0)
 
     CELERY_BROKER_URL: str
     CELERY_RESULT_BACKEND: str
 
-    LOG_LEVEL: str
-    LOG_JSON_FORMAT: bool
+    LOG_LEVEL: str = "INFO"
+    LOG_JSON_FORMAT: bool = False
 
     API_KEY: str = ""
-    TRUSTED_PROXY_COUNT: int = 0
+    TRUSTED_PROXY_COUNT: int = Field(default=0, ge=0, le=10)
     ALLOWED_HOSTS: str = ""
+
+    APP_UPDATE_ENABLED: bool = True
+    APP_LATEST_VERSION: str = ""
+    APP_LATEST_BUILD_NUMBER: int = Field(default=0, ge=0)
+    APP_MIN_VERSION: str = ""
+    APP_FORCE_UPDATE: bool = False
+    APP_APK_URL: str = ""
+    APP_APK_SHA256: str = ""
+    APP_APK_SIZE_BYTES: int = Field(default=0, ge=0)
+    APP_CHANGELOG: str = ""
+    APP_RELEASED_AT: str = ""
+    APP_UPDATE_RATE_LIMIT_PER_MINUTE: int = Field(default=30, ge=0)
 
     @property
     def cors_origins_list(self) -> list[str]:
@@ -111,8 +122,12 @@ class Settings(BaseSettings):
         new_query = ""
         if sslmode:
             ssl_map = {
-                "disable": "disable", "allow": "prefer", "prefer": "prefer",
-                "require": "require", "verify-ca": "require", "verify-full": "verify-full",
+                "disable": "disable",
+                "allow": "prefer",
+                "prefer": "prefer",
+                "require": "require",
+                "verify-ca": "require",
+                "verify-full": "verify-full",
             }
             new_query = urlencode({"ssl": ssl_map.get(sslmode.lower(), "require")})
 

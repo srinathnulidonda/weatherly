@@ -80,10 +80,10 @@ class AlertService:
         return result.rowcount
 
     async def ingest_provider_alerts(self, lat: float, lon: float, radius_km: float = 100.0) -> list[AlertResponse]:
-        from app.providers.provider_aggregator import ProviderAggregator
+        from app.providers.provider_aggregator import get_provider_aggregator
 
         try:
-            raw_alerts = await ProviderAggregator().fetch_alerts(lat, lon, radius_km)
+            raw_alerts = await get_provider_aggregator().fetch_alerts(lat, lon, radius_km)
         except Exception as exc:
             logger.error("Failed to fetch provider alerts: %s", exc)
             return []
