@@ -4,9 +4,9 @@
             "version": "2.0.0",
             "build_number": 2,
             "apk_url": "/apk/releases/weatherly-2.0.0.apk",
-            "file_size_bytes": null,
+            "file_size_bytes": "18449212",
             "released_at": "2026-10-11",
-            "sha256": null,
+            "sha256": "af1159bd5488018140bbb3d820b6cd9386f025ebe270a001948459f1944db8e4",
             "changelog": [
                 "In-app updates with verified downloads",
                 "Offline support with last-known weather",
@@ -19,7 +19,7 @@
             "version": "1.0.0",
             "build_number": 1,
             "apk_url": "https://drive.google.com/uc?export=download&id=10lPOkrf2HACA6ht-cirq_ubcW6adB_W2",
-            "file_size_bytes": null,
+            "file_size_bytes": "52428800",
             "released_at": "2025-10-08",
             "sha256": null,
             "changelog": [

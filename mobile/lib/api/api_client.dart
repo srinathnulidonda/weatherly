@@ -38,7 +38,7 @@ class ApiClient {
   })  : baseUrl = baseUrl ??
             const String.fromEnvironment(
               'API_URL',
-              defaultValue: 'https://weatherly-dev.onrender.com',
+              defaultValue: 'https://getweatherly.onrender.com',
             ),
         timeout = timeout ?? const Duration(seconds: 30),
         _client = client ?? http.Client(),
