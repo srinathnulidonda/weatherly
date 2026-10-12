@@ -1,417 +1,369 @@
 // web/src/pages/Releases.jsx
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-    Download as DownloadIcon,
-    Package,
-    Calendar,
-    ChevronRight,
-    ChevronDown,
-    Tag,
-    Sparkles,
-    Search,
-    Check,
-    Link as LinkIcon,
-    X,
-    Clock,
-    Hash,
-} from 'lucide-react';
-import { PageTransition, AnimatedItem } from '@/components/common/PageTransition';
-import { Card } from '@/components/ui/Card';
-import { SkeletonCard } from '@/components/ui/Skeleton';
-import { ErrorState } from '@/components/ui/ErrorState';
+import { Calendar, ChevronRight, Hash, Package, RefreshCw, Search, ShieldAlert, Tag, X } from 'lucide-react';
 import { useReleases } from '@/hooks/useReleases';
 import { formatDate } from '@/utils/formatters';
-import { cn } from '@/lib/cn';
+import { InfoStrip } from '@/components/download/InfoStrip';
+import { CopyLinkButton } from '@/components/download/CopyLinkButton';
+import { DownloadButton } from '@/components/download/DownloadButton';
 
 function formatBytes(bytes) {
-    if (!bytes || bytes <= 0) return null;
-    if (bytes >= 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
-    return `${bytes} B`;
+    const n = Number(bytes);
+    if (!n && n !== 0) return '—';
+    if (n >= 1e9) return `${(n / 1e9).toFixed(2)} GB`;
+    if (n >= 1e6) return `${(n / 1e6).toFixed(1)} MB`;
+    if (n >= 1e3) return `${(n / 1e3).toFixed(0)} KB`;
+    return `${n} B`;
 }
 
 function releaseId(release) {
     return `v${release.version}-b${release.build_number}`;
 }
 
-function StatBlock({ icon: Icon, label, value }) {
+function Breadcrumb() {
     return (
-        <div className="glass-metric p-2.5 xs:p-3 sm:p-4 flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-                <Icon size={13} className="text-orange-500" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
-                <p className="text-[8.5px] xs:text-[9px] sm:text-[10px] uppercase tracking-wider text-stone-400 dark:text-stone-500 font-semibold truncate">
-                    {label}
-                </p>
-                <p className="text-xs xs:text-sm font-semibold text-stone-800 dark:text-stone-200 truncate">
-                    {value}
-                </p>
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[12.5px] text-stone-400 dark:text-stone-500 mb-5">
+            <span>Android</span>
+            <ChevronRight size={13} aria-hidden="true" />
+            <Link to="/apk" className="hover:text-stone-700 dark:hover:text-stone-300">
+                Download
+            </Link>
+            <ChevronRight size={13} aria-hidden="true" />
+            <span className="text-stone-700 dark:text-stone-300 font-medium">Releases</span>
+        </nav>
+    );
+}
+
+function VersionBadge({ version, isLatest }) {
+    const major = String(version).split('.').slice(0, 2).join('.');
+    return (
+        <div
+            className={`shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center text-[12px] font-bold text-white tabular-nums ${isLatest
+                ? 'bg-gradient-to-br from-orange-400 to-orange-600 shadow-[0_6px_16px_-4px_rgba(249,115,22,0.5)]'
+                : 'bg-gradient-to-br from-stone-400 to-stone-600 dark:from-stone-600 dark:to-stone-800'
+                }`}
+        >
+            {major}
+        </div>
+    );
+}
+
+function ReleaseRow({ release, isLatest }) {
+    const [expanded, setExpanded] = useState(false);
+    const changelog = release.changelog ?? [];
+    const releaseDate = release.released_at ?? null;
+    const sizeBytes = release.file_size_bytes ?? null;
+    const visibleLines = expanded ? changelog : changelog.slice(0, 4);
+    const hasMore = changelog.length > 4;
+
+    return (
+        <div
+            id={releaseId(release)}
+            className={`relative rounded-3xl border bg-white dark:bg-white/[0.02] p-5 sm:p-6 lg:p-7 scroll-mt-28 ${isLatest
+                ? 'border-orange-300/50 dark:border-orange-500/25 ring-1 ring-orange-400/20'
+                : 'border-stone-200/70 dark:border-white/[0.08]'
+                }`}
+        >
+            <span
+                className={`hidden lg:flex absolute -left-[45px] top-9 w-3 h-3 rounded-full ring-4 ring-white dark:ring-stone-950 ${isLatest ? 'bg-orange-500' : 'bg-stone-300 dark:bg-stone-700'
+                    }`}
+                aria-hidden="true"
+            />
+
+            <div className="grid gap-5 lg:grid-cols-[200px_1fr] lg:gap-8">
+                <div className="min-w-0">
+                    <div className="flex items-center gap-3">
+                        <VersionBadge version={release.version} isLatest={isLatest} />
+                        <div className="min-w-0">
+                            <h3 className="text-[15px] font-bold text-stone-900 dark:text-stone-50 truncate">
+                                Version {release.version}
+                            </h3>
+                            {isLatest && (
+                                <span className="inline-flex items-center rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10.5px] font-bold px-2 py-0.5 mt-1">
+                                    Latest
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    <p className="text-[12px] text-stone-400 dark:text-stone-500 mt-3 leading-relaxed">
+                        Build #{release.build_number ?? '—'} · {releaseDate ? formatDate(releaseDate) : '—'} ·{' '}
+                        {formatBytes(sizeBytes)}
+                    </p>
+
+                    <div className="mt-4 flex items-center gap-2">
+                        <DownloadButton
+                            url={release.apk_url}
+                            filename={`weatherly-v${release.version}.apk`}
+                            label="Download"
+                            variant={isLatest ? 'primary' : 'outline'}
+                            size="sm"
+                            className="flex-1 lg:flex-none"
+                        />
+                        <CopyLinkButton
+                            url={release.apk_url}
+                            className="w-10 h-10 shrink-0 inline-flex items-center justify-center rounded-2xl border border-stone-200 dark:border-white/[0.12] text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-50 hover:bg-stone-50 dark:hover:bg-white/[0.06] transition-colors"
+                        />
+                    </div>
+                </div>
+
+                <div className="min-w-0 lg:pt-1">
+                    {changelog.length > 0 ? (
+                        <>
+                            <ul className="space-y-1.5">
+                                {visibleLines.map((item, i) => (
+                                    <li
+                                        key={i}
+                                        className="flex gap-2.5 text-[13px] sm:text-[13.5px] text-stone-600 dark:text-stone-300 leading-relaxed break-words"
+                                    >
+                                        <span className="mt-[7px] w-1 h-1 rounded-full bg-stone-300 dark:bg-stone-600 shrink-0" aria-hidden="true" />
+                                        <span className="min-w-0">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                            {hasMore && (
+                                <button
+                                    type="button"
+                                    onClick={() => setExpanded((v) => !v)}
+                                    className="mt-2.5 text-[12.5px] font-semibold text-orange-600 dark:text-orange-400 hover:underline underline-offset-2"
+                                >
+                                    {expanded ? 'Show less' : `Show ${changelog.length - 4} more`}
+                                </button>
+                            )}
+                        </>
+                    ) : (
+                        <p className="text-[13px] text-stone-400 dark:text-stone-500 italic">No changelog provided.</p>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
 
-function CopyLinkButton({ url }) {
-    const [copied, setCopied] = useState(false);
-    const copy = async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        try {
-            await navigator.clipboard.writeText(new URL(url, window.location.origin).toString());
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1800);
-        } catch {
-            setCopied(false);
-        }
-    };
+function LoadingState() {
     return (
-        <button type="button" onClick={copy} className="btn-icon shrink-0" aria-label="Copy download link">
-            {copied ? <Check size={14} className="text-green-500" aria-hidden="true" /> : <LinkIcon size={14} aria-hidden="true" />}
-        </button>
+        <div className="space-y-4 animate-pulse">
+            {[0, 1, 2].map((i) => (
+                <div key={i} className="h-48 rounded-3xl bg-stone-100 dark:bg-white/[0.04]" />
+            ))}
+        </div>
     );
 }
 
-function ReleaseRow({ release, isLatest, isLast }) {
-    const sizeLabel = formatBytes(release.file_size_bytes);
-    const changelog = Array.isArray(release.changelog) ? release.changelog : [];
-    const LIMIT = 4;
-    const [expanded, setExpanded] = useState(false);
-    const showToggle = changelog.length > LIMIT;
-    const visibleLines = expanded ? changelog : changelog.slice(0, LIMIT);
-    const id = releaseId(release);
-
+function ErrorCard({ message, onRetry }) {
     return (
-        <div
-            id={id}
-            style={{ scrollMarginTop: 'calc(var(--topbar-h) + 20px)' }}
-            className={cn(
-                'px-4 sm:px-6 lg:px-7 py-5 sm:py-6 lg:py-7 transition-colors',
-                !isLast && 'border-b border-stone-100 dark:border-white/[0.06]'
-            )}
-        >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3.5 sm:gap-4">
-                <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
-                            {release.version}
-                        </h3>
-                        {isLatest && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-semibold uppercase tracking-wider">
-                                <Sparkles size={9} aria-hidden="true" />
-                                Latest
-                            </span>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-x-3 gap-y-1 flex-wrap text-xs text-stone-500 dark:text-stone-400">
-                        <span className="flex items-center gap-1.5">
-                            <Hash size={11} aria-hidden="true" />
-                            Build {release.build_number}
-                        </span>
-                        {release.released_at && (
-                            <span className="flex items-center gap-1.5">
-                                <Calendar size={11} aria-hidden="true" />
-                                {formatDate(release.released_at, 'MMM d, yyyy')}
-                            </span>
-                        )}
-                        {sizeLabel && (
-                            <span className="flex items-center gap-1.5">
-                                <Package size={11} aria-hidden="true" />
-                                {sizeLabel}
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                    <a
-                        href={release.apk_url}
-                        rel="noopener noreferrer"
-                        className={cn(
-                            isLatest ? 'btn-primary' : 'btn-outline',
-                            'inline-flex items-center justify-center gap-1.5 !px-4 !py-2 text-xs sm:text-sm flex-1 sm:flex-none'
-                        )}
-                    >
-                        <DownloadIcon size={13} aria-hidden="true" />
-                        Download
-                    </a>
-                    <CopyLinkButton url={release.apk_url} />
-                </div>
-            </div>
-
-            {changelog.length > 0 && (
-                <div className="mt-4">
-                    <ul className="space-y-2">
-                        {visibleLines.map((line, i) => (
-                            <li key={i} className="flex gap-2.5 text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
-                                <span className="mt-[7px] w-1 h-1 rounded-full bg-orange-500 shrink-0" aria-hidden="true" />
-                                <span>{line}</span>
-                            </li>
-                        ))}
-                    </ul>
-                    {showToggle && (
-                        <button
-                            type="button"
-                            onClick={() => setExpanded((v) => !v)}
-                            className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors"
-                        >
-                            {expanded ? 'Show less' : `Show ${changelog.length - LIMIT} more`}
-                            <ChevronDown
-                                size={12}
-                                className={cn('transition-transform duration-200', expanded && 'rotate-180')}
-                                aria-hidden="true"
-                            />
-                        </button>
-                    )}
-                </div>
-            )}
+        <div className="rounded-3xl border border-red-200/60 dark:border-red-500/20 bg-red-50/60 dark:bg-red-500/[0.06] p-8 text-center">
+            <ShieldAlert size={28} className="mx-auto mb-3 text-red-500" aria-hidden="true" />
+            <p className="text-[14.5px] font-semibold text-stone-900 dark:text-stone-50 mb-1">Couldn't load releases</p>
+            <p className="text-[13px] text-stone-500 dark:text-stone-400 mb-4">{message || 'Something went wrong.'}</p>
+            <button
+                type="button"
+                onClick={onRetry}
+                className="inline-flex items-center gap-2 rounded-xl border border-stone-200 dark:border-white/[0.12] px-4 py-2 text-[13px] font-semibold hover:bg-white dark:hover:bg-white/[0.06] transition-colors"
+            >
+                <RefreshCw size={14} aria-hidden="true" />
+                Try again
+            </button>
         </div>
     );
 }
 
 function Releases() {
-    const { data: releases, isLoading, error, refetch } = useReleases();
+    const { data: releases = [], isLoading, error, refetch } = useReleases();
     const [query, setQuery] = useState('');
     const [activeId, setActiveId] = useState(null);
+    const sectionRefs = useRef(new Map());
 
     const sorted = useMemo(
-        () =>
-            [...(releases ?? [])].sort((a, b) => {
-                const aBuild = Number(a?.build_number) || 0;
-                const bBuild = Number(b?.build_number) || 0;
-                if (aBuild !== bBuild) return bBuild - aBuild;
-                return String(b?.version ?? '').localeCompare(String(a?.version ?? ''));
-            }),
+        () => [...releases].sort((a, b) => (b.build_number ?? 0) - (a.build_number ?? 0)),
         [releases]
     );
-    const latest = sorted[0];
-    const latestBuild = latest?.build_number;
-    const hasSidebar = sorted.length > 2;
+    const latest = sorted[0] ?? null;
+    const isSearching = query.trim().length > 0;
 
     const filtered = useMemo(() => {
-        if (!query.trim()) return sorted;
+        if (!isSearching) return sorted;
         const q = query.trim().toLowerCase();
         return sorted.filter(
-            (r) => String(r.version).toLowerCase().includes(q) || String(r.build_number).includes(q)
+            (r) => String(r.version).toLowerCase().includes(q) || String(r.build_number ?? '').includes(q)
         );
-    }, [sorted, query]);
+    }, [sorted, query, isSearching]);
 
     useEffect(() => {
-        if (!filtered.length) return undefined;
+        if (!sorted.length || isSearching) return undefined;
         const observer = new IntersectionObserver(
             (entries) => {
-                const visible = entries
-                    .filter((e) => e.isIntersecting)
-                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-                if (visible[0]) setActiveId(visible[0].target.id);
+                const visible = entries.find((e) => e.isIntersecting);
+                if (visible) setActiveId(visible.target.id);
             },
-            { rootMargin: '-15% 0px -70% 0px', threshold: 0 }
+            { rootMargin: '-20% 0px -65% 0px', threshold: 0 }
         );
-        filtered.forEach((r) => {
-            const el = document.getElementById(releaseId(r));
-            if (el) observer.observe(el);
-        });
+        sectionRefs.current.forEach((node) => node && observer.observe(node));
         return () => observer.disconnect();
-    }, [filtered]);
+    }, [sorted, isSearching]);
+
+    const showNav = !isSearching && sorted.length > 1;
+    const latestDate = latest?.released_at ?? null;
+    const latestSize = latest?.file_size_bytes ?? null;
+
+    const jumpTo = (id) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     return (
-        <PageTransition className="page-shell stack-y">
-            <AnimatedItem>
-                <div className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-stone-500 flex-wrap">
-                    <Link to="/apk" className="hover:text-stone-600 dark:hover:text-stone-300 transition-colors">
-                        Android
-                    </Link>
-                    <ChevronRight size={11} aria-hidden="true" />
-                    <Link to="/apk" className="hover:text-stone-600 dark:hover:text-stone-300 transition-colors">
-                        Download
-                    </Link>
-                    <ChevronRight size={11} aria-hidden="true" />
-                    <span className="text-stone-600 dark:text-stone-300 font-medium">Releases</span>
-                </div>
-            </AnimatedItem>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-28 md:pb-16">
+            <Breadcrumb />
 
-            <AnimatedItem delay={0.02}>
-                <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                        <h1 className="page-heading">Release history</h1>
-                        {sorted.length > 0 && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-stone-100 dark:bg-white/[0.06] text-stone-500 dark:text-stone-400 text-[10px] font-semibold uppercase tracking-wider">
-                                {sorted.length} {sorted.length === 1 ? 'version' : 'versions'}
-                            </span>
-                        )}
-                    </div>
-                    <p className="text-sm text-stone-500 dark:text-stone-400 max-w-2xl">
-                        Every published Weatherly Android build, newest first. Installing any version replaces the
-                        current install — your saved locations and settings stay intact.
-                    </p>
+            <div className="mb-6">
+                <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-[22px] sm:text-[26px] font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+                        Release notes
+                    </h1>
+                    {sorted.length > 0 && (
+                        <span className="inline-flex items-center rounded-full bg-stone-900/5 dark:bg-white/10 text-stone-500 dark:text-stone-400 text-[11.5px] font-semibold px-2.5 py-0.5 tabular-nums">
+                            {sorted.length} version{sorted.length === 1 ? '' : 's'}
+                        </span>
+                    )}
                 </div>
-            </AnimatedItem>
+                <p className="text-[13.5px] text-stone-500 dark:text-stone-400 mt-1.5 max-w-prose">
+                    Every Weatherly build, with full changelogs and direct APK downloads.
+                </p>
+            </div>
 
-            {isLoading ? (
-                <div className="stack-y">
-                    <SkeletonCard className="h-24" />
-                    <SkeletonCard className="h-64" />
+            {isLoading && <LoadingState />}
+            {!isLoading && error && <ErrorCard message={error.message} onRetry={refetch} />}
+
+            {!isLoading && !error && sorted.length === 0 && (
+                <div className="rounded-3xl border border-stone-200 dark:border-white/[0.08] p-10 text-center">
+                    <Package size={28} className="mx-auto mb-3 text-stone-300 dark:text-stone-600" aria-hidden="true" />
+                    <p className="text-[14.5px] font-semibold text-stone-900 dark:text-stone-50">No releases yet</p>
                 </div>
-            ) : error ? (
-                <ErrorState error={error} onRetry={refetch} />
-            ) : sorted.length === 0 ? (
-                <Card padding="sm">
-                    <div className="py-10 flex flex-col items-center text-center">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-stone-200 to-stone-100 dark:from-white/[0.08] dark:to-white/[0.02] flex items-center justify-center mb-4">
-                            <Tag size={22} className="text-stone-400" aria-hidden="true" />
-                        </div>
-                        <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
-                            No releases published yet
-                        </p>
-                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-sm">
-                            Once an APK is uploaded to <code className="font-mono">/apk/releases/</code> and added to
-                            the manifest, it will appear here.
-                        </p>
-                        <Link to="/apk" className="btn-outline mt-4 inline-flex items-center gap-2">
-                            Back to download
-                        </Link>
-                    </div>
-                </Card>
-            ) : (
+            )}
+
+            {!isLoading && !error && latest && (
                 <>
-                    <AnimatedItem delay={0.05}>
-                        <div className="grid grid-cols-3 gap-1.5 xs:gap-2 sm:gap-4">
-                            <StatBlock icon={Tag} label="Latest version" value={latest.version} />
-                            <StatBlock icon={Hash} label="Latest build" value={latest.build_number} />
-                            <StatBlock
-                                icon={Clock}
-                                label="Released"
-                                value={latest.released_at ? formatDate(latest.released_at, 'MMM d') : '—'}
-                            />
-                        </div>
-                    </AnimatedItem>
+                    <InfoStrip
+                        className="mb-6"
+                        items={[
+                            { icon: Tag, value: `v${latest.version}`, label: 'Latest' },
+                            { icon: Hash, value: latest.build_number ?? '—', label: 'Build' },
+                            { icon: Package, value: formatBytes(latestSize), label: 'Size' },
+                            { icon: Calendar, value: latestDate ? formatDate(latestDate) : '—', label: 'Released' },
+                        ]}
+                    />
 
-                    <div
-                        className={cn(
-                            'grid gap-6 lg:gap-10 items-start',
-                            hasSidebar && 'lg:grid-cols-[200px_1fr]'
+                    <div className="relative mb-5">
+                        <Search
+                            size={15}
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
+                            aria-hidden="true"
+                        />
+                        <input
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Search by version or build number"
+                            className="w-full rounded-2xl border border-stone-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.02] pl-10 pr-10 py-2.5 text-[13.5px] text-stone-900 dark:text-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-400/50"
+                        />
+                        {isSearching && (
+                            <button
+                                type="button"
+                                onClick={() => setQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
+                                aria-label="Clear search"
+                            >
+                                <X size={15} />
+                            </button>
                         )}
-                    >
-                        {/* Sticky sidebar must NOT be a descendant of a motion/transformed element,
-                            otherwise `position: sticky` breaks (transform creates a new containing block). */}
-                        {hasSidebar && (
-                            <div className="hidden lg:block lg:sticky lg:top-24 self-start">
-                                <AnimatedItem delay={0.08}>
-                                    <p className="label mb-3 px-1">Jump to version</p>
-                                    <nav className="space-y-0.5 max-h-[60vh] overflow-y-auto scrollbar-hide pr-2">
-                                        {sorted.map((r) => {
-                                            const id = releaseId(r);
-                                            const active = activeId === id;
-                                            return (
-                                                <a
-                                                    key={id}
-                                                    href={`#${id}`}
-                                                    className={cn(
-                                                        'flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors',
-                                                        active
-                                                            ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
-                                                            : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-white/[0.04] hover:text-stone-800 dark:hover:text-stone-200'
-                                                    )}
-                                                >
-                                                    <span className="truncate">{r.version}</span>
-                                                    {r.build_number === latestBuild && (
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" aria-hidden="true" />
-                                                    )}
-                                                </a>
-                                            );
-                                        })}
-                                    </nav>
-                                </AnimatedItem>
-                            </div>
-                        )}
+                    </div>
 
-                        <div className="min-w-0">
-                            {hasSidebar && (
-                                <div className="lg:hidden -mx-1 mb-4 overflow-x-auto scrollbar-hide">
-                                    <div className="flex items-center gap-2 px-1 pb-1">
-                                        {sorted.map((r) => (
-                                            <a
-                                                key={releaseId(r)}
-                                                href={`#${releaseId(r)}`}
-                                                className="shrink-0 px-3 py-1.5 rounded-full border border-stone-200 dark:border-white/[0.08] text-xs font-medium text-stone-600 dark:text-stone-300 whitespace-nowrap active:scale-95 transition-transform"
-                                            >
-                                                {r.version}
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                    {isSearching && (
+                        <p className="text-[12.5px] text-stone-400 dark:text-stone-500 mb-4 px-1">
+                            {filtered.length} result{filtered.length === 1 ? '' : 's'} for "{query.trim()}"
+                        </p>
+                    )}
 
-                            <AnimatedItem delay={0.05}>
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
-                                    <div className="relative flex-1 min-w-0">
-                                        <Search
-                                            size={14}
-                                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500"
-                                            aria-hidden="true"
-                                        />
-                                        <input
-                                            type="text"
-                                            value={query}
-                                            onChange={(e) => setQuery(e.target.value)}
-                                            placeholder="Search version or build…"
-                                            className="w-full h-11 sm:h-10 pl-9 pr-9 rounded-full border border-stone-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] text-sm text-stone-700 dark:text-stone-300 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:border-orange-400/60 dark:focus:border-orange-400/40 transition-colors"
-                                        />
-                                        {query && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setQuery('')}
-                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-white/[0.08] transition-colors"
-                                                aria-label="Clear search"
-                                            >
-                                                <X size={12} aria-hidden="true" />
-                                            </button>
-                                        )}
-                                    </div>
-                                    <a
-                                        href={latest.apk_url}
-                                        rel="noopener noreferrer"
-                                        className="btn-primary inline-flex items-center justify-center gap-2 !px-4 !py-2.5 text-sm w-full sm:w-auto shrink-0"
+                    {showNav && (
+                        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 mb-2 -mx-4 px-4 scrollbar-none">
+                            {sorted.map((r) => {
+                                const id = releaseId(r);
+                                const active = activeId === id;
+                                return (
+                                    <button
+                                        key={id}
+                                        type="button"
+                                        onClick={() => jumpTo(id)}
+                                        className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${active
+                                            ? 'border-orange-400 bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                                            : 'border-stone-200 dark:border-white/[0.1] text-stone-500 dark:text-stone-400'
+                                            }`}
                                     >
-                                        <DownloadIcon size={14} aria-hidden="true" />
-                                        Latest ({latest.version})
-                                    </a>
-                                </div>
-                            </AnimatedItem>
+                                        v{r.version}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
 
-                            {filtered.length === 0 ? (
-                                <Card padding="sm">
-                                    <div className="py-8 flex flex-col items-center text-center">
-                                        <Search size={18} className="text-stone-400 mb-2" aria-hidden="true" />
-                                        <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
-                                            No matches found
-                                        </p>
-                                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                                            Try a different version or build number.
-                                        </p>
-                                    </div>
-                                </Card>
-                            ) : (
-                                <AnimatedItem delay={0.1}>
-                                    <Card padding={false} className="overflow-hidden">
-                                        {filtered.map((release, i) => (
-                                            <ReleaseRow
-                                                key={releaseId(release)}
-                                                release={release}
-                                                isLatest={release.build_number === latestBuild && latestBuild != null}
-                                                isLast={i === filtered.length - 1}
-                                            />
-                                        ))}
-                                    </Card>
-                                </AnimatedItem>
+                    <div className={showNav ? 'lg:grid lg:grid-cols-[200px_1fr] lg:gap-10' : ''}>
+                        {showNav && (
+                            <aside className="hidden lg:block">
+                                <div className="sticky top-24 space-y-1">
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-2 px-1">
+                                        Jump to version
+                                    </p>
+                                    {sorted.map((r) => {
+                                        const id = releaseId(r);
+                                        const active = activeId === id;
+                                        return (
+                                            <button
+                                                key={id}
+                                                type="button"
+                                                onClick={() => jumpTo(id)}
+                                                className={`block w-full text-left rounded-xl px-3 py-1.5 text-[13px] font-medium transition-colors ${active
+                                                    ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                                                    : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-white/[0.05]'
+                                                    }`}
+                                            >
+                                                v{r.version}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </aside>
+                        )}
+
+                        <div
+                            className={
+                                showNav
+                                    ? 'space-y-4 lg:border-l lg:border-stone-200/70 dark:lg:border-white/[0.07] lg:pl-10'
+                                    : 'space-y-4'
+                            }
+                        >
+                            {filtered.map((release) => (
+                                <div
+                                    key={releaseId(release)}
+                                    ref={(node) => {
+                                        if (node) sectionRefs.current.set(releaseId(release), node);
+                                        else sectionRefs.current.delete(releaseId(release));
+                                    }}
+                                >
+                                    <ReleaseRow release={release} isLatest={releaseId(release) === releaseId(latest)} />
+                                </div>
+                            ))}
+                            {filtered.length === 0 && (
+                                <div className="rounded-3xl border border-dashed border-stone-200 dark:border-white/[0.1] py-14 text-center">
+                                    <Search size={22} className="mx-auto mb-3 text-stone-300 dark:text-stone-600" aria-hidden="true" />
+                                    <p className="text-[13.5px] text-stone-400 dark:text-stone-500">
+                                        No releases match "{query.trim()}"
+                                    </p>
+                                </div>
                             )}
                         </div>
                     </div>
                 </>
             )}
-        </PageTransition>
+        </div>
     );
 }
 

@@ -23,5 +23,6 @@ export const BOTTOM_NAV = [
     { path: '/', label: 'Home', icon: 'CloudSun' },
     { path: '/forecast', label: 'Forecast', icon: 'CalendarDays' },
     { path: '/alerts', label: 'Alerts', icon: 'ShieldAlert' },
+    { path: '/apk', label: 'Download', icon: 'Download' },
     { path: '/settings', label: 'Settings', icon: 'Settings' },
 ];

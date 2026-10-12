@@ -5,7 +5,7 @@ const { Section } = LegalPage;
 
 function Cookies() {
     return (
-        <LegalPage title="Cookie Policy" updated="August 23, 2026">
+        <LegalPage title="Cookie Policy" updated="August 23, 2026" current="cookies">
             <Section title="1. What Are Cookies">
                 <p>
                     Cookies are small text files stored on your device by your browser. Weatherly
@@ -88,8 +88,8 @@ function Cookies() {
                     If you have questions about our use of cookies or this Cookie Policy, please contact us at:
                 </p>
                 <p className="mt-2">
-                    <a href="mailto:privacy@weatherly.app" className="text-orange-500 hover:underline">
-                        privacy@weatherly.app
+                    <a href="mailto:srinathnulidonda.dev@gmail.com" className="text-orange-500 hover:underline">
+                        srinathnulidonda.dev@gmail.com
                     </a>
                 </p>
             </Section>

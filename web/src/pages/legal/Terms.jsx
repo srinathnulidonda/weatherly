@@ -5,7 +5,7 @@ const { Section } = LegalPage;
 
 function Terms() {
     return (
-        <LegalPage title="Terms of Service" updated="August 23, 2026">
+        <LegalPage title="Terms of Service" updated="August 23, 2026" current="terms">
             <Section title="1. Acceptance of Terms">
                 <p>
                     By accessing or using Weatherly ("the App," "the Service," or "Weatherly"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the App. Your continued use of the App constitutes your acceptance of and agreement to all terms and conditions in this document.
@@ -114,19 +114,9 @@ function Terms() {
                     If you have any questions about these Terms of Service, please contact us at:
                 </p>
                 <p className="mt-2">
-                    <a href="mailto:legal@weatherly.app" className="text-orange-500 hover:underline">
-                        legal@weatherly.app
+                    <a href="mailto:srinathnulidonda.dev@gmail.com" className="text-orange-500 hover:underline">
+                        srinathnulidonda.dev@gmail.com
                     </a>
-                </p>
-                <p className="mt-2">
-                    Alternatively, you can reach us at:
-                </p>
-                <p className="mt-1">
-                    Weatherly Legal Team<br />
-                    c/o Weatherly Inc.<br />
-                    123 Weatherly Way<br />
-                    San Francisco, CA 94105<br />
-                    USA
                 </p>
             </Section>
         </LegalPage>

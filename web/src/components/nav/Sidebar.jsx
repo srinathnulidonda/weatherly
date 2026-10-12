@@ -7,6 +7,7 @@ import { SIDEBAR_NAV } from '@/utils/constants';
 import { useActiveAlertCount } from '@/hooks/useAlerts';
 import { useTheme } from '@/hooks/useTheme';
 import logoImage from '@/assets/logo-weatherly.png';
+import { isNavActive } from '@/utils/nav';
 
 const icons = { CloudSun, CalendarDays, BarChart3, ShieldAlert, Search, Settings, Download };
 const THEME_ICONS = { dark: Moon, light: Sun, system: Monitor };
@@ -102,7 +103,7 @@ function Sidebar() {
                                     <NavItem
                                         key={item.path}
                                         item={item}
-                                        isActive={pathname === item.path}
+                                        isActive={isNavActive(pathname, item.path)}
                                         onNavigate={handleNav}
                                         alertCount={alertCount}
                                     />

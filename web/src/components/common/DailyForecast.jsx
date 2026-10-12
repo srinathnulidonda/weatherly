@@ -35,7 +35,7 @@ function DailyForecast({ days = 7, compact = false, viewAllLink = false, classNa
 
     if (isLoading) {
         return (
-            <div className={cn('space-y-1.5 sm:space-y-2', className)}>}
+            <div className={cn('space-y-1.5 sm:space-y-2', className)}>
                 {Array.from({ length: compact ? 5 : 7 }).map((_, i) => (
                     <SkeletonRow key={i} />
                 ))}

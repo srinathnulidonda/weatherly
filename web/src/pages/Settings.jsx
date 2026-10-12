@@ -1,6 +1,6 @@
 // web/src/pages/Settings.jsx
 import { useState } from 'react';
-import { Sun, Moon, Monitor, RefreshCw, Trash2, Plus, Info, Database, ChevronRight, Mail, Star, FileText, Shield, Cookie, AlertTriangle } from 'lucide-react';
+import { Sun, Moon, Monitor, RefreshCw, Trash2, Plus, Database, ChevronRight, Mail, FileText, Shield, Cookie, AlertTriangle } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/Button';
 import { LocationManager } from '@/components/settings/LocationManager';
 import { ConfirmDialog } from '@/components/settings/ConfirmDialog';
 import { CurrentLocationCard } from '@/components/settings/CurrentLocationCard';
+import { AppIcon } from '@/components/download/AppIcon';
+import { InfoStrip } from '@/components/download/InfoStrip';
 import { useTheme } from '@/hooks/useTheme';
 import { useLocation } from '@/hooks/useLocation';
 import { useStore } from '@/stores/store';
@@ -26,6 +28,11 @@ const UNIT_OPTIONS = [
     { value: 'imperial', label: 'Imperial', detail: '°F · mph · inHg' },
     { value: 'standard', label: 'Standard', detail: 'K · m/s · hPa' },
 ];
+
+function capitalize(str) {
+    if (!str) return '—';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 function SettingsSection({ label, children, action, delay = 0 }) {
     return (
@@ -142,6 +149,8 @@ function Settings() {
     const [cacheCleared, setCacheCleared] = useState(false);
 
     const selectedUnit = UNIT_OPTIONS.find((o) => o.value === units);
+    const appName = import.meta.env.VITE_APP_NAME || 'Weatherly';
+    const appVersion = import.meta.env.VITE_APP_VERSION || 'dev';
 
     const handleClearCache = async () => {
         await queryClient.invalidateQueries();
@@ -152,153 +161,160 @@ function Settings() {
 
     return (
         <PageTransition className="page-shell">
-            <div className="stack-y max-w-2xl mx-auto pb-5 sm:pb-6 !gap-4 sm:!gap-5">
-                <motion.div
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-28 md:pb-16">
+                <motion.header
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex justify-center xs:justify-start"
+                    className="mb-6 sm:mb-8"
                 >
-                    <span className="inline-flex items-center px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-stone-100 dark:bg-white/[0.06] text-[10px] sm:text-xs font-semibold text-stone-600 dark:text-stone-300 uppercase tracking-wider">
+                    <h1 className="text-[22px] sm:text-[26px] font-bold text-stone-900 dark:text-stone-50 tracking-tight">
                         Settings
-                    </span>
-                </motion.div>
-
-                <SettingsSection label="Preferences" delay={0.05}>
-                    <Card padding="sm">
-                        <SettingsRow
-                            icon={resolvedTheme === 'dark' ? Moon : Sun}
-                            iconColor="bg-indigo-100 dark:bg-indigo-500/10"
-                            title="Appearance"
-                            description="Choose how Weatherly looks"
-                            control={
-                                <SegmentedControl
-                                    groupId="theme"
-                                    options={THEME_OPTIONS}
-                                    value={theme}
-                                    onChange={setTheme}
-                                    renderLabel={(opt) => (
-                                        <span className="flex items-center justify-center gap-1 sm:gap-1.5">
-                                            <opt.icon size={12} aria-hidden="true" />
-                                            <span className="hidden xs:inline">{opt.label}</span>
-                                        </span>
-                                    )}
-                                />
-                            }
-                        />
-                        <SettingsRow
-                            icon={Database}
-                            iconColor="bg-blue-100 dark:bg-blue-500/10"
-                            title="Units"
-                            description={selectedUnit?.detail}
-                            control={
-                                <SegmentedControl
-                                    groupId="units"
-                                    options={UNIT_OPTIONS}
-                                    value={units}
-                                    onChange={setUnits}
-                                />
-                            }
-                            last
-                        />
-                    </Card>
-                </SettingsSection>
-
-                <SettingsSection
-                    label="Locations"
-                    delay={0.1}
-                    action={
-                        <button
-                            type="button"
-                            onClick={() => navigate('/search')}
-                            aria-label="Add location"
-                            className="min-touch flex items-center justify-center rounded-full text-orange-500 hover:bg-orange-500/10 transition-colors"
-                        >
-                            <Plus size={15} aria-hidden="true" />
-                        </button>
-                    }
-                >
-                    {locationError && (
-                        <div className="flex items-center gap-2 p-3 rounded-2xl bg-red-500/10 border border-red-500/20" role="alert">
-                            <AlertTriangle size={14} className="text-red-500 shrink-0" aria-hidden="true" />
-                            <p className="text-xs text-red-600 dark:text-red-400 flex-1 min-w-0">{locationError}</p>
-                        </div>
-                    )}
-
-                    <CurrentLocationCard
-                        location={location}
-                        confirmed={locationConfirmed}
-                        loading={locationLoading}
-                        cityDisplay={cityDisplay}
-                        onRefresh={refreshLocation}
-                        onClear={() => setClearLocationConfirm(true)}
-                    />
-
-                    <Card padding="sm">
-                        <div className="flex items-center justify-between mb-2.5 sm:mb-3 px-1 pt-1">
-                            <p className="text-[13px] sm:text-sm font-semibold text-stone-700 dark:text-stone-300">Saved Locations</p>
-                        </div>
-                        <LocationManager />
-                    </Card>
-                </SettingsSection>
-
-                <SettingsSection label="Data & Storage" delay={0.15}>
-                    <Card padding="sm">
-                        <SettingsRow
-                            icon={RefreshCw}
-                            iconColor="bg-teal-100 dark:bg-teal-500/10"
-                            title="Clear cached weather data"
-                            description="Force refresh all weather information"
-                            control={
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setClearCacheConfirm(true)}
-                                    className={cn(cacheCleared && 'text-green-500 border-green-300')}
-                                >
-                                    {cacheCleared ? 'Cleared ✓' : 'Clear cache'}
-                                </Button>
-                            }
-                            last
-                        />
-                    </Card>
-                </SettingsSection>
-
-                <SettingsSection label="Legal" delay={0.18}>
-                    <Card padding="sm">
-                        <LinkRow icon={FileText} title="Terms of Service" to="/legal/terms" />
-                        <LinkRow icon={Shield} title="Privacy Policy" to="/legal/privacy" />
-                        <LinkRow icon={Cookie} title="Cookie Policy" to="/legal/cookies" last />
-                    </Card>
-                </SettingsSection>
-
-                <SettingsSection label="About" delay={0.22}>
-                    <Card padding="sm">
-                        <SettingsRow
-                            icon={Info}
-                            iconColor="bg-orange-100 dark:bg-orange-500/10"
-                            title="Application"
-                            control={<span className="text-[13px] sm:text-sm text-stone-700 dark:text-stone-300 font-medium">{import.meta.env.VITE_APP_NAME || 'Weatherly'}</span>}
-                        />
-                        <SettingsRow
-                            title="Theme"
-                            control={<span className="text-[13px] sm:text-sm text-stone-700 dark:text-stone-300 capitalize">{resolvedTheme}</span>}
-                        />
-                        <SettingsRow
-                            title="Units"
-                            control={<span className="text-[13px] sm:text-sm text-stone-700 dark:text-stone-300 capitalize">{units}</span>}
-                            last
-                        />
-                    </Card>
-
-                    <Card padding="sm">
-                        <LinkRow icon={Star} title="Rate the app" href="#" />
-                        <LinkRow icon={Mail} title="Send feedback" href="mailto:feedback@weatherly.app" last />
-                    </Card>
-
-                    <p className="text-center text-[10px] sm:text-[11px] text-stone-400 dark:text-stone-600 pt-1">
-                        © {new Date().getFullYear()} {import.meta.env.VITE_APP_NAME || 'Weatherly'} · v1.0.0
+                    </h1>
+                    <p className="text-[13.5px] text-stone-500 dark:text-stone-400 mt-1.5 max-w-prose">
+                        Customize appearance, units, and manage your saved locations and data.
                     </p>
-                </SettingsSection>
+                </motion.header>
+
+                <div className="grid lg:grid-cols-[1fr_340px] gap-6 lg:gap-8 items-start">
+                    <div className="space-y-6 sm:space-y-8 min-w-0">
+                        <SettingsSection label="Preferences" delay={0.05}>
+                            <Card padding="sm">
+                                <SettingsRow
+                                    icon={resolvedTheme === 'dark' ? Moon : Sun}
+                                    iconColor="bg-indigo-100 dark:bg-indigo-500/10"
+                                    title="Appearance"
+                                    description="Choose how Weatherly looks"
+                                    control={
+                                        <SegmentedControl
+                                            groupId="theme"
+                                            options={THEME_OPTIONS}
+                                            value={theme}
+                                            onChange={setTheme}
+                                            renderLabel={(opt) => (
+                                                <span className="flex items-center justify-center gap-1 sm:gap-1.5">
+                                                    <opt.icon size={12} aria-hidden="true" />
+                                                    <span className="hidden xs:inline">{opt.label}</span>
+                                                </span>
+                                            )}
+                                        />
+                                    }
+                                />
+                                <SettingsRow
+                                    icon={Database}
+                                    iconColor="bg-blue-100 dark:bg-blue-500/10"
+                                    title="Units"
+                                    description={selectedUnit?.detail}
+                                    control={
+                                        <SegmentedControl
+                                            groupId="units"
+                                            options={UNIT_OPTIONS}
+                                            value={units}
+                                            onChange={setUnits}
+                                        />
+                                    }
+                                    last
+                                />
+                            </Card>
+                        </SettingsSection>
+
+                        <SettingsSection
+                            label="Locations"
+                            delay={0.1}
+                            action={
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/search')}
+                                    aria-label="Add location"
+                                    className="min-touch flex items-center justify-center rounded-full text-orange-500 hover:bg-orange-500/10 transition-colors"
+                                >
+                                    <Plus size={15} aria-hidden="true" />
+                                </button>
+                            }
+                        >
+                            {locationError && (
+                                <div className="flex items-center gap-2 p-3 rounded-2xl bg-red-500/10 border border-red-500/20" role="alert">
+                                    <AlertTriangle size={14} className="text-red-500 shrink-0" aria-hidden="true" />
+                                    <p className="text-xs text-red-600 dark:text-red-400 flex-1 min-w-0">{locationError}</p>
+                                </div>
+                            )}
+
+                            <CurrentLocationCard
+                                location={location}
+                                confirmed={locationConfirmed}
+                                loading={locationLoading}
+                                cityDisplay={cityDisplay}
+                                onRefresh={refreshLocation}
+                                onClear={() => setClearLocationConfirm(true)}
+                            />
+
+                            <Card padding="sm">
+                                <div className="flex items-center justify-between mb-2.5 sm:mb-3 px-1 pt-1">
+                                    <p className="text-[13px] sm:text-sm font-semibold text-stone-700 dark:text-stone-300">Saved Locations</p>
+                                </div>
+                                <LocationManager />
+                            </Card>
+                        </SettingsSection>
+
+                        <SettingsSection label="Data & Storage" delay={0.15}>
+                            <Card padding="sm">
+                                <SettingsRow
+                                    icon={RefreshCw}
+                                    iconColor="bg-teal-100 dark:bg-teal-500/10"
+                                    title="Clear cached weather data"
+                                    description="Force refresh all weather information"
+                                    control={
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setClearCacheConfirm(true)}
+                                            className={cn(cacheCleared && 'text-green-500 border-green-300')}
+                                        >
+                                            {cacheCleared ? 'Cleared ✓' : 'Clear cache'}
+                                        </Button>
+                                    }
+                                    last
+                                />
+                            </Card>
+                        </SettingsSection>
+                    </div>
+
+                    <aside className="space-y-6 lg:sticky lg:top-24">
+                        <Card padding="lg" className="text-center">
+                            <AppIcon size={56} className="mx-auto mb-3" />
+                            <p className="text-[15px] sm:text-base font-bold text-stone-900 dark:text-stone-50">
+                                {appName}
+                            </p>
+                            <p className="text-[11px] sm:text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+                                Version {appVersion}
+                            </p>
+                            <InfoStrip
+                                className="mt-4"
+                                items={[
+                                    { icon: resolvedTheme === 'dark' ? Moon : Sun, value: capitalize(resolvedTheme), label: 'Theme' },
+                                    { icon: Database, value: capitalize(units), label: 'Units' },
+                                ]}
+                            />
+                        </Card>
+
+                        <Card padding="sm">
+                            <h2 className="text-[13.5px] font-bold text-stone-900 dark:text-stone-50 px-1 pt-1 pb-2 flex items-center gap-2">
+                                <Shield size={15} className="text-orange-500" aria-hidden="true" />
+                                Legal &amp; policies
+                            </h2>
+                            <LinkRow icon={FileText} title="Terms of Service" to="/legal/terms" />
+                            <LinkRow icon={Shield} title="Privacy Policy" to="/legal/privacy" />
+                            <LinkRow icon={Cookie} title="Cookie Policy" to="/legal/cookies" last />
+                        </Card>
+
+                        <Card padding="sm">
+                            <LinkRow icon={Mail} title="Send feedback" href="mailto:feedback@weatherly.app" last />
+                        </Card>
+
+                        <p className="text-center text-[10px] sm:text-[11px] text-stone-400 dark:text-stone-600">
+                            © {new Date().getFullYear()} {appName}
+                        </p>
+                    </aside>
+                </div>
             </div>
 
             <ConfirmDialog

@@ -1,4 +1,5 @@
 // web/src/components/settings/ConfirmDialog.jsx
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
@@ -16,6 +17,20 @@ function ConfirmDialog({
     icon: Icon = AlertTriangle,
     danger = false,
 }) {
+    useEffect(() => {
+        if (!open) return undefined;
+        const onKey = (e) => {
+            if (e.key === 'Escape') onClose();
+        };
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        window.addEventListener('keydown', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            document.body.style.overflow = previousOverflow;
+        };
+    }, [open, onClose]);
+
     if (typeof document === 'undefined') return null;
 
     return createPortal(
@@ -45,7 +60,7 @@ function ConfirmDialog({
                                     'w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0',
                                     danger ? 'bg-red-500/10' : 'bg-orange-500/10'
                                 )}>
-                                    <Icon size={18} className={danger ? 'text-red-500' : 'text-orange-500'} />
+                                    <Icon size={18} className={danger ? 'text-red-500' : 'text-orange-500'} aria-hidden="true" />
                                 </div>
                                 <h3 className="text-[15px] sm:text-base font-semibold text-stone-900 dark:text-stone-100">
                                     {title}

@@ -5,7 +5,7 @@ const { Section } = LegalPage;
 
 function Privacy() {
     return (
-        <LegalPage title="Privacy Policy" updated="August 23, 2026">
+        <LegalPage title="Privacy Policy" updated="August 23, 2026" current="privacy">
             <Section title="1. Information We Collect">
                 <p>Weatherly collects and processes the following types of information to provide our weather intelligence services:</p>
                 <ul className="list-disc pl-4 sm:pl-5 space-y-1">
@@ -99,7 +99,7 @@ function Privacy() {
                     <li><strong>Objection:</strong> You may object to certain types of processing, such as direct marketing</li>
                 </ul>
                 <p className="mt-2">
-                    To exercise these rights, please contact us at <a href="mailto:privacy@weatherly.app" className="text-orange-500 hover:underline">privacy@weatherly.app</a>.
+                    To exercise these rights, please contact us at <a href="mailto:srinathnulidonda.dev@gmail.com" className="text-orange-500 hover:underline">srinathnulidonda.dev@gmail.com</a>.
                 </p>
             </Section>
 
@@ -126,19 +126,9 @@ function Privacy() {
                     If you have questions about this Privacy Policy or our data practices, please contact us at:
                 </p>
                 <p className="mt-2">
-                    <a href="mailto:privacy@weatherly.app" className="text-orange-500 hover:underline">
-                        privacy@weatherly.app
+                    <a href="mailto:srinathnulidonda.dev@gmail.com" className="text-orange-500 hover:underline">
+                        srinathnulidonda.dev@gmail.com
                     </a>
-                </p>
-                <p className="mt-2">
-                    Alternatively, you can reach us at:
-                </p>
-                <p className="mt-1">
-                    Weatherly Privacy Team<br />
-                    c/o Weatherly Inc.<br />
-                    123 Weatherly Way<br />
-                    San Francisco, CA 94105<br />
-                    USA
                 </p>
             </Section>
         </LegalPage>

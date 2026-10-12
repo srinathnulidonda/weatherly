@@ -1,12 +1,13 @@
 // web/src/components/nav/BottomNav.jsx
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CloudSun, CalendarDays, ShieldAlert, Settings } from 'lucide-react';
+import { CloudSun, CalendarDays, ShieldAlert, Settings, Download } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useActiveAlertCount } from '@/hooks/useAlerts';
 import { BOTTOM_NAV } from '@/utils/constants';
+import { isNavActive } from '@/utils/nav';
 
-const icons = { CloudSun, CalendarDays, ShieldAlert, Settings };
+const icons = { CloudSun, CalendarDays, ShieldAlert, Settings, Download };
 
 const springConfig = { stiffness: 380, damping: 30, mass: 0.8 };
 
@@ -17,11 +18,11 @@ function BottomNav() {
 
     return (
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-bottomnav safe-area-bottom">
-            <div className="px-4 pb-4 pt-2">
-                <div className="flex items-center justify-between gap-0.5 px-1.5 py-1.5 rounded-[24px] max-w-xs mx-auto bg-white/98 dark:bg-stone-900/98 backdrop-blur-2xl shadow-[0_-2px_20px_rgba(0,0,0,0.08),0_6px_32px_rgba(0,0,0,0.14)] dark:shadow-[0_-2px_20px_rgba(0,0,0,0.3),0_6px_40px_rgba(0,0,0,0.6)]">
+            <div className="px-2.5 xs:px-4 pb-4 pt-2">
+                <div className="flex items-center justify-between gap-0 px-1 py-1.5 rounded-[22px] max-w-sm mx-auto bg-white/98 dark:bg-stone-900/98 backdrop-blur-2xl shadow-[0_-2px_20px_rgba(0,0,0,0.08),0_6px_32px_rgba(0,0,0,0.14)] dark:shadow-[0_-2px_20px_rgba(0,0,0,0.3),0_6px_40px_rgba(0,0,0,0.6)]">
                     {BOTTOM_NAV.map((item) => {
                         const Icon = icons[item.icon];
-                        const isActive = pathname === item.path;
+                        const isActive = isNavActive(pathname, item.path);
                         const isAlerts = item.path === '/alerts';
 
                         return (
@@ -43,7 +44,7 @@ function BottomNav() {
 
                                 <div className="relative z-10">
                                     <Icon
-                                        size={18}
+                                        size={17}
                                         strokeWidth={isActive ? 2.4 : 1.8}
                                         className={cn(
                                             'transition-all duration-500 ease-out',
@@ -70,7 +71,7 @@ function BottomNav() {
 
                                 <motion.span
                                     className={cn(
-                                        'relative z-10 text-[9px] font-semibold leading-none tracking-tight select-none',
+                                        'relative z-10 text-[8.5px] font-semibold leading-none tracking-tight select-none whitespace-nowrap',
                                         isActive
                                             ? 'text-orange-500'
                                             : 'text-stone-400 dark:text-stone-500'
