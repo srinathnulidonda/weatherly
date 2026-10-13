@@ -336,6 +336,11 @@
         min-height: 44px;
     }
 
+    .mask-fade-x {
+        mask-image: linear-gradient(to right, transparent 0, black 20px, black calc(100% - 20px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0, black 20px, black calc(100% - 20px), transparent 100%);
+    }
+
     @media (min-width: 475px) {
         .xs\:inline {
             display: inline;

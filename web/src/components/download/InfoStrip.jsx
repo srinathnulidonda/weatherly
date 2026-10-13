@@ -5,14 +5,15 @@ function InfoStrip({ items = [], className }) {
     return (
         <div
             className={cn(
-                'flex items-stretch rounded-2xl border border-stone-200/70 dark:border-white/[0.08] bg-stone-50/60 dark:bg-white/[0.02] divide-x divide-stone-200/70 dark:divide-white/[0.07] overflow-hidden',
+                'grid grid-cols-2 gap-px rounded-2xl overflow-hidden bg-stone-200/70 dark:bg-white/[0.08] border border-stone-200/70 dark:border-white/[0.08]',
+                'sm:flex sm:gap-0 sm:bg-stone-50/60 sm:dark:bg-white/[0.02] sm:divide-x sm:divide-stone-200/70 sm:dark:divide-white/[0.07]',
                 className
             )}
         >
             {items.map((item, i) => (
                 <div
                     key={item.label || i}
-                    className="flex-1 min-w-0 flex flex-col items-center justify-center gap-1 px-2 py-3 sm:py-3.5 text-center"
+                    className="min-w-0 flex flex-col items-center justify-center gap-1 px-2 py-3 sm:py-3.5 text-center bg-stone-50/80 dark:bg-white/[0.03] sm:bg-transparent sm:dark:bg-transparent sm:flex-1"
                 >
                     {item.icon && (
                         <item.icon size={14} className="text-stone-400 dark:text-stone-500 mb-0.5" aria-hidden="true" />

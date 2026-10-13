@@ -1,6 +1,9 @@
 // web/src/pages/Settings.jsx
 import { useState } from 'react';
-import { Sun, Moon, Monitor, RefreshCw, Trash2, Plus, Database, ChevronRight, Mail, FileText, Shield, Cookie, AlertTriangle } from 'lucide-react';
+import {
+    Sun, Moon, Monitor, RefreshCw, Trash2, Plus, Database, ChevronRight,
+    FileText, Shield, Cookie, AlertTriangle, ScrollText, Smartphone,
+} from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -10,6 +13,7 @@ import { Button } from '@/components/ui/Button';
 import { LocationManager } from '@/components/settings/LocationManager';
 import { ConfirmDialog } from '@/components/settings/ConfirmDialog';
 import { CurrentLocationCard } from '@/components/settings/CurrentLocationCard';
+import { SegmentedControl } from '@/components/settings/SegmentedControl';
 import { AppIcon } from '@/components/download/AppIcon';
 import { InfoStrip } from '@/components/download/InfoStrip';
 import { useTheme } from '@/hooks/useTheme';
@@ -53,66 +57,57 @@ function SettingsSection({ label, children, action, delay = 0 }) {
 
 function SettingsRow({ icon: Icon, iconColor, title, description, control, last = false }) {
     return (
-        <div className={cn('flex items-center gap-2.5 sm:gap-3 py-3 sm:py-3.5 flex-wrap sm:flex-nowrap', !last && 'border-b border-stone-100 dark:border-white/[0.06]')}>
+        <div
+            className={cn(
+                'flex items-center gap-2.5 sm:gap-3 py-3 sm:py-3.5 flex-wrap sm:flex-nowrap',
+                !last && 'border-b border-stone-100 dark:border-white/[0.06]'
+            )}
+        >
             {Icon && (
-                <div className={cn('w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0', iconColor || 'bg-stone-100 dark:bg-white/[0.05]')} aria-hidden="true">
+                <div
+                    className={cn(
+                        'w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0',
+                        iconColor || 'bg-stone-100 dark:bg-white/[0.05]'
+                    )}
+                    aria-hidden="true"
+                >
                     <Icon size={14} className="text-stone-500 dark:text-stone-400" />
                 </div>
             )}
             <div className="min-w-0 flex-1">
                 <p className="text-[13px] sm:text-sm font-medium text-stone-900 dark:text-stone-100">{title}</p>
-                {description && <p className="text-[11px] sm:text-xs text-stone-500 dark:text-stone-400 mt-0.5">{description}</p>}
+                {description && (
+                    <p className="text-[11px] sm:text-xs text-stone-500 dark:text-stone-400 mt-0.5">{description}</p>
+                )}
             </div>
             <div className="shrink-0 w-full sm:w-auto">{control}</div>
         </div>
     );
 }
 
-function SegmentedControl({ options, value, onChange, renderLabel, groupId }) {
-    return (
-        <div className="flex items-center gap-1 bg-stone-100 dark:bg-white/[0.05] rounded-full p-1 w-full sm:w-auto">
-            {options.map((opt) => {
-                const active = value === opt.value;
-                return (
-                    <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => onChange(opt.value)}
-                        className={cn(
-                            'relative flex-1 sm:flex-none px-2.5 sm:px-3.5 h-9 sm:h-10 min-w-[40px] sm:min-w-[44px] text-[11px] sm:text-xs font-medium rounded-full transition-all duration-200 whitespace-nowrap',
-                            active ? 'text-orange-500' : 'text-stone-500 hover:text-stone-700 dark:hover:text-stone-300'
-                        )}
-                    >
-                        {active && (
-                            <motion.span
-                                layoutId={`segbg-${groupId}`}
-                                className="absolute inset-0 bg-white dark:bg-white/[0.10] shadow-soft rounded-full"
-                                transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-                            />
-                        )}
-                        <span className="relative z-10">
-                            {renderLabel ? renderLabel(opt) : opt.label}
-                        </span>
-                    </button>
-                );
-            })}
-        </div>
-    );
-}
-
 function LinkRow({ icon: Icon, title, href, to, external = false, last = false }) {
     const rowClass = cn(
-        'flex items-center gap-2.5 sm:gap-3 py-3 sm:py-3.5 group',
+        'flex items-center gap-3 py-3 sm:py-3.5 px-2 -mx-2 rounded-xl group transition-colors duration-150',
+        'hover:bg-stone-100/70 dark:hover:bg-white/[0.04] active:bg-stone-200/60 dark:active:bg-white/[0.06]',
         !last && 'border-b border-stone-100 dark:border-white/[0.06]'
     );
 
     const content = (
         <>
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0" aria-hidden="true">
+            <div
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0"
+                aria-hidden="true"
+            >
                 <Icon size={14} className="text-stone-500 dark:text-stone-400" />
             </div>
-            <span className="text-[13px] sm:text-sm font-medium text-stone-900 dark:text-stone-100 flex-1">{title}</span>
-            <ChevronRight size={14} className="text-stone-300 dark:text-stone-600 group-hover:translate-x-0.5 transition-transform duration-150" aria-hidden="true" />
+            <span className="text-[13px] sm:text-sm font-medium text-stone-900 dark:text-stone-100 flex-1">
+                {title}
+            </span>
+            <ChevronRight
+                size={14}
+                className="text-stone-300 dark:text-stone-600 group-hover:translate-x-0.5 transition-transform duration-150"
+                aria-hidden="true"
+            />
         </>
     );
 
@@ -140,7 +135,8 @@ function Settings() {
     const { theme, setTheme, resolvedTheme } = useTheme();
     const units = useStore((s) => s.units);
     const setUnits = useStore((s) => s.setUnits);
-    const { location, locationConfirmed, locationLoading, locationError, refreshLocation, clearLocation, cityDisplay } = useLocation();
+    const { location, locationConfirmed, locationLoading, locationError, refreshLocation, clearLocation, cityDisplay } =
+        useLocation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -161,7 +157,7 @@ function Settings() {
 
     return (
         <PageTransition className="page-shell">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-28 md:pb-16">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-6 md:pb-16">
                 <motion.header
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -190,11 +186,11 @@ function Settings() {
                                             options={THEME_OPTIONS}
                                             value={theme}
                                             onChange={setTheme}
-                                            renderLabel={(opt) => (
-                                                <span className="flex items-center justify-center gap-1 sm:gap-1.5">
-                                                    <opt.icon size={12} aria-hidden="true" />
+                                            renderLabel={(opt, active) => (
+                                                <>
+                                                    <opt.icon size={12} strokeWidth={active ? 2.3 : 1.8} aria-hidden="true" />
                                                     <span className="hidden xs:inline">{opt.label}</span>
-                                                </span>
+                                                </>
                                             )}
                                         />
                                     }
@@ -232,26 +228,30 @@ function Settings() {
                             }
                         >
                             {locationError && (
-                                <div className="flex items-center gap-2 p-3 rounded-2xl bg-red-500/10 border border-red-500/20" role="alert">
+                                <div
+                                    className="flex items-center gap-2 p-3 rounded-2xl bg-red-500/10 border border-red-500/20"
+                                    role="alert"
+                                >
                                     <AlertTriangle size={14} className="text-red-500 shrink-0" aria-hidden="true" />
                                     <p className="text-xs text-red-600 dark:text-red-400 flex-1 min-w-0">{locationError}</p>
                                 </div>
                             )}
 
-                            <CurrentLocationCard
-                                location={location}
-                                confirmed={locationConfirmed}
-                                loading={locationLoading}
-                                cityDisplay={cityDisplay}
-                                onRefresh={refreshLocation}
-                                onClear={() => setClearLocationConfirm(true)}
-                            />
-
-                            <Card padding="sm">
-                                <div className="flex items-center justify-between mb-2.5 sm:mb-3 px-1 pt-1">
-                                    <p className="text-[13px] sm:text-sm font-semibold text-stone-700 dark:text-stone-300">Saved Locations</p>
+                            <Card padding={false} className="overflow-hidden">
+                                <CurrentLocationCard
+                                    location={location}
+                                    confirmed={locationConfirmed}
+                                    loading={locationLoading}
+                                    cityDisplay={cityDisplay}
+                                    onRefresh={refreshLocation}
+                                    onClear={() => setClearLocationConfirm(true)}
+                                />
+                                <div className="border-t border-stone-100 dark:border-white/[0.06] px-3 sm:px-3.5 pt-3 pb-2 sm:pb-2.5">
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500 px-0.5 pb-1.5">
+                                        Saved locations
+                                    </p>
+                                    <LocationManager />
                                 </div>
-                                <LocationManager />
                             </Card>
                         </SettingsSection>
 
@@ -264,10 +264,13 @@ function Settings() {
                                     description="Force refresh all weather information"
                                     control={
                                         <Button
-                                            variant="outline"
+                                            variant="ghost"
                                             size="sm"
                                             onClick={() => setClearCacheConfirm(true)}
-                                            className={cn(cacheCleared && 'text-green-500 border-green-300')}
+                                            className={cn(
+                                                'text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 dark:hover:bg-orange-500/10',
+                                                cacheCleared && '!text-green-500'
+                                            )}
                                         >
                                             {cacheCleared ? 'Cleared ✓' : 'Clear cache'}
                                         </Button>
@@ -298,16 +301,21 @@ function Settings() {
 
                         <Card padding="sm">
                             <h2 className="text-[13.5px] font-bold text-stone-900 dark:text-stone-50 px-1 pt-1 pb-2 flex items-center gap-2">
+                                <Smartphone size={15} className="text-orange-500" aria-hidden="true" />
+                                Android app
+                            </h2>
+                            <LinkRow icon={Smartphone} title="Download the app" to="/apk" />
+                            <LinkRow icon={ScrollText} title="Release notes" to="/apk/releases" last />
+                        </Card>
+
+                        <Card padding="sm">
+                            <h2 className="text-[13.5px] font-bold text-stone-900 dark:text-stone-50 px-1 pt-1 pb-2 flex items-center gap-2">
                                 <Shield size={15} className="text-orange-500" aria-hidden="true" />
                                 Legal &amp; policies
                             </h2>
                             <LinkRow icon={FileText} title="Terms of Service" to="/legal/terms" />
                             <LinkRow icon={Shield} title="Privacy Policy" to="/legal/privacy" />
                             <LinkRow icon={Cookie} title="Cookie Policy" to="/legal/cookies" last />
-                        </Card>
-
-                        <Card padding="sm">
-                            <LinkRow icon={Mail} title="Send feedback" href="mailto:feedback@weatherly.app" last />
                         </Card>
 
                         <p className="text-center text-[10px] sm:text-[11px] text-stone-400 dark:text-stone-600">
