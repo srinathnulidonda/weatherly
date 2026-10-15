@@ -1,4 +1,4 @@
-// web/src/components/alerts/AlertBanner.jsx
+// src/components/common/AlertBanner.jsx
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, X, ArrowRight } from 'lucide-react';

@@ -1,4 +1,4 @@
-// web/src/components/home/SunTimes.jsx
+// src/components/home/SunTimes.jsx
 import { useId, useMemo } from 'react';
 import { Sunrise, Sunset, Sun, Moon, Clock } from 'lucide-react';
 import { cn } from '@/lib/cn';

@@ -1,4 +1,4 @@
-// web/src/utils/formatters.js
+// src/utils/formatters.js
 import { format, parseISO, isValid, formatDistanceToNow, isToday, isTomorrow } from 'date-fns';
 import { getAqiToken, getUvToken, getSeverityToken } from '@/lib/theme';
 

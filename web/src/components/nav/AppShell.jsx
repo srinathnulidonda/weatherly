@@ -1,4 +1,4 @@
-// web/src/components/nav/AppShell.jsx
+// src/components/nav/AppShell.jsx
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { TopAppBar } from './TopAppBar';

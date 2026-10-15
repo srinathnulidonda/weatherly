@@ -1,4 +1,4 @@
-// web/src/components/common/HourlyForecast.jsx
+// src/components/common/HourlyForecast.jsx
 import { useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Clock, TrendingUp, ArrowRight } from 'lucide-react';

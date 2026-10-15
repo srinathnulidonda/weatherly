@@ -1,4 +1,4 @@
-// web/src/pages/NotFound.jsx
+// src/pages/NotFound.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CloudOff, Home, Search as SearchIcon, Settings as SettingsIcon } from 'lucide-react';

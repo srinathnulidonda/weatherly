@@ -1,4 +1,4 @@
-// web/src/components/download/DownloadButton.jsx
+// src/components/download/DownloadButton.jsx
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Download as DownloadIcon, Loader2 } from 'lucide-react';
 import { useApkDownload } from '@/hooks/useApkDownload';

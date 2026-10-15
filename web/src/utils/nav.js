@@ -1,4 +1,4 @@
-// web/src/utils/nav.js
+// src/utils/nav.js
 export function isNavActive(pathname, path) {
     const normalize = (value) => (value.length > 1 ? value.replace(/\/+$/, '') : value);
     const current = normalize(pathname);

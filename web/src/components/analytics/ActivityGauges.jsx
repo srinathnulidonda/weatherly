@@ -1,4 +1,4 @@
-// web/src/components/analytics/ActivityGauges.jsx
+// src/components/analytics/ActivityGauges.jsx
 import { motion } from 'framer-motion';
 import {
     Smile, Activity, Bike, TreePine, Flower2, Car, Sun, Footprints,

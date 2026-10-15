@@ -1,4 +1,4 @@
-// web/src/components/home/WeatherDetails.jsx
+// src/components/home/WeatherDetails.jsx
 import {
     Thermometer, Droplets, Gauge, Eye, Sun, CloudRain, Wind as WindIcon,
     ArrowDown, ArrowUp, Minus,

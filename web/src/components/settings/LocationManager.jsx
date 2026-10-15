@@ -1,4 +1,4 @@
-// web/src/components/settings/LocationManager.jsx
+// src/components/settings/LocationManager.jsx
 import { Reorder, useDragControls } from 'framer-motion';
 import { GripVertical, X, MapPin, Star } from 'lucide-react';
 import { cn } from '@/lib/cn';

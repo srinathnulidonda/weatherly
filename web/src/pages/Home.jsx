@@ -1,4 +1,4 @@
-// web/src/pages/Home.jsx
+// src/pages/Home.jsx
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';

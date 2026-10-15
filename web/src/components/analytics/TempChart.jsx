@@ -1,4 +1,4 @@
-// web/src/components/analytics/TempChart.jsx
+// src/components/analytics/TempChart.jsx
 import { useId, useMemo } from 'react';
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis,

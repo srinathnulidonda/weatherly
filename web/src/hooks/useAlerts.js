@@ -1,4 +1,4 @@
-// web/src/hooks/useAlerts.js
+// src/hooks/useAlerts.js
 import { useQuery } from '@tanstack/react-query';
 import { weatherApi } from '../api/weather';
 import { useActiveCoords } from './useActiveLocation';

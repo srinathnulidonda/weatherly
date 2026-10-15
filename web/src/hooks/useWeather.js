@@ -1,4 +1,4 @@
-// web/src/hooks/useWeather.js
+// src/hooks/useWeather.js
 import { useQuery } from '@tanstack/react-query';
 import { useStore } from '../stores/store';
 import { weatherApi } from '../api/weather';

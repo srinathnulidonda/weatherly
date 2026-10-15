@@ -569,7 +569,7 @@ VITE_ENABLE_DEBUG_TOOLS=false                  # Disable in production
 ### Project Structure
 
 ```
-web/
+
 ├── public/                   # Static assets
 │   ├── favicon.png
 │   └── fronts/               # Custom fonts

@@ -1,4 +1,4 @@
-// web/src/components/common/DailyForecast.jsx
+// src/components/common/DailyForecast.jsx
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';

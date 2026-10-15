@@ -1,4 +1,4 @@
-// web/src/components/ui/WeatherIcon.jsx
+// src/components/ui/WeatherIcon.jsx
 import { cn } from '@/lib/cn';
 import {
     Sun, Moon, CloudSun, CloudMoon, Cloud, CloudFog, CloudDrizzle,

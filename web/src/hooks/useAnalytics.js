@@ -1,4 +1,4 @@
-// web/src/hooks/useAnalytics.js
+// src/hooks/useAnalytics.js
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useStore } from '../stores/store';
 import { weatherApi } from '../api/weather';

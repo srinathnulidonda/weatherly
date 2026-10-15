@@ -1,4 +1,4 @@
-// web/src/components/background/DynamicSky.jsx
+// src/components/background/DynamicSky.jsx
 import { useEffect, useId, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/cn';

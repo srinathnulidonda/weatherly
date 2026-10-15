@@ -1,4 +1,4 @@
-// web/src/pages/Forecast.jsx
+// src/pages/Forecast.jsx
 import { useState, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';

@@ -1,4 +1,4 @@
-// web/src/components/home/SmartAdvisories.jsx
+// src/components/home/SmartAdvisories.jsx
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {

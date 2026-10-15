@@ -1,4 +1,4 @@
-// web/src/components/nav/BottomNav.jsx
+// src/components/nav/BottomNav.jsx
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CloudSun, CalendarDays, ShieldAlert, Settings, Download } from 'lucide-react';

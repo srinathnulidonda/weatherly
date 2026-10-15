@@ -1,4 +1,4 @@
-// web/src/components/common/LocationSwitcherSheet.jsx
+// src/components/common/LocationSwitcherSheet.jsx
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';

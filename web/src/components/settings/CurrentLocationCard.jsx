@@ -1,4 +1,4 @@
-// web/src/components/settings/CurrentLocationCard.jsx
+// src/components/settings/CurrentLocationCard.jsx
 import { useState } from 'react';
 import { RefreshCw, Trash2, CheckCircle2, Navigation, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,4 +1,4 @@
-// web/src/components/nav/Sidebar.jsx
+// src/components/nav/Sidebar.jsx
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CloudSun, CalendarDays, BarChart3, ShieldAlert, Search, Settings, Download, Moon, Sun, Monitor } from 'lucide-react';
@@ -10,8 +10,12 @@ import logoImage from '@/assets/logo-weatherly.png';
 import { isNavActive } from '@/utils/nav';
 
 const icons = { CloudSun, CalendarDays, BarChart3, ShieldAlert, Search, Settings, Download };
-const THEME_ICONS = { dark: Moon, light: Sun, system: Monitor };
-const THEME_ORDER = ['light', 'dark', 'system'];
+
+const THEME_OPTIONS = [
+    { value: 'light', label: 'Light', icon: Sun },
+    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'system', label: 'System', icon: Monitor },
+];
 
 const NAV_SECTIONS = [
     { label: 'Overview', items: ['/', '/forecast'] },
@@ -27,33 +31,34 @@ function NavItem({ item, isActive, onNavigate, alertCount }) {
     return (
         <button
             onClick={() => onNavigate(item.path)}
+            aria-current={isActive ? 'page' : undefined}
             className={cn(
-                'relative w-full flex items-center gap-2.5 h-9 px-2.5 rounded-md text-[13px] transition-colors duration-100 group',
+                'relative flex w-full items-center gap-2.5 rounded-lg px-2.5 h-9 text-[13px] transition-colors duration-150',
                 isActive
-                    ? 'bg-stone-200/60 dark:bg-white/[0.06] text-stone-900 dark:text-stone-50 font-medium'
-                    : 'text-stone-600 dark:text-stone-400 hover:bg-stone-200/40 dark:hover:bg-white/[0.03] hover:text-stone-900 dark:hover:text-stone-200'
+                    ? 'text-orange-600 dark:text-orange-400 font-medium'
+                    : 'text-stone-600 hover:bg-stone-900/[0.04] hover:text-stone-900 dark:text-stone-400 dark:hover:bg-white/[0.04] dark:hover:text-stone-200'
             )}
         >
             {isActive && (
                 <motion.span
-                    layoutId="sidebarActiveBar"
-                    className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-orange-500"
-                    transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+                    layoutId="sidebarActivePill"
+                    className="absolute inset-0 rounded-lg bg-orange-500/10"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
                 />
             )}
             {Icon && (
                 <Icon
                     size={15}
-                    strokeWidth={1.8}
+                    strokeWidth={isActive ? 2.1 : 1.8}
                     className={cn(
-                        'shrink-0 transition-colors',
-                        isActive ? 'text-orange-500' : 'text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300'
+                        'relative z-10 shrink-0',
+                        isActive ? 'text-orange-500' : 'text-stone-400 dark:text-stone-500'
                     )}
                 />
             )}
-            <span className="flex-1 text-left truncate">{item.label}</span>
+            <span className="relative z-10 flex-1 truncate text-left">{item.label}</span>
             {isAlerts && alertCount > 0 && (
-                <span className="min-w-[16px] h-4 flex items-center justify-center text-[9px] font-semibold rounded bg-red-500/15 text-red-600 dark:text-red-400 px-1 shrink-0">
+                <span className="relative z-10 inline-flex h-[17px] min-w-[17px] shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[9.5px] font-bold text-white">
                     {alertCount > 99 ? '99+' : alertCount}
                 </span>
             )}
@@ -72,73 +77,87 @@ function Sidebar() {
 
     return (
         <aside className="hidden md:flex flex-col w-[280px] h-dvh fixed left-0 top-0 z-sidebar bg-stone-50 dark:bg-stone-950 border-r border-stone-200 dark:border-white/[0.07]">
-            <div className="flex items-center justify-center py-3">
+            {/* Logo */}
+            <div className="flex items-center justify-center py-4">
                 <img
                     src={logoImage}
                     alt="Logo"
                     onClick={() => handleNav('/')}
-                    className="w-40 h-auto object-contain cursor-pointer"
+                    className="h-auto w-36 cursor-pointer object-contain transition-opacity hover:opacity-80"
                 />
             </div>
 
-            <button
-                onClick={() => handleNav('/search')}
-                className="mx-4 mb-3 flex items-center gap-2 h-9 px-2.5 rounded-md border border-stone-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] text-[12.5px] text-stone-400 dark:text-stone-500 hover:border-stone-300 dark:hover:border-white/[0.12] hover:text-stone-600 dark:hover:text-stone-400 transition-colors"
-            >
-                <Search size={13} className="shrink-0" />
-                <span className="flex-1 text-left">Search a city…</span>
-            </button>
+            {/* Search shortcut */}
+            <div className="px-4 pb-3">
+                <button
+                    onClick={() => handleNav('/search')}
+                    className="flex h-9 w-full items-center gap-2 rounded-full bg-stone-100/80 px-3 text-[12.5px] text-stone-500 ring-1 ring-black/[0.04] transition-colors hover:bg-stone-200/60 dark:bg-white/[0.05] dark:text-stone-500 dark:ring-white/[0.07] dark:hover:bg-white/[0.08]"
+                >
+                    <Search size={13} className="shrink-0 text-stone-400 dark:text-stone-500" />
+                    <span className="flex-1 text-left">Search a city…</span>
+                </button>
+            </div>
 
-            <nav className="flex-1 px-4 pb-3 space-y-4 overflow-y-auto scrollbar-hide">
-                {NAV_SECTIONS.map((section) => (
-                    <div key={section.label}>
-                        <p className="px-2.5 mb-1 text-[10px] font-medium uppercase tracking-[0.08em] text-stone-400 dark:text-stone-600">
-                            {section.label}
-                        </p>
-                        <div className="space-y-0.5">
-                            {section.items.map((path) => {
-                                const item = findNavItem(path);
-                                if (!item) return null;
-                                return (
-                                    <NavItem
-                                        key={item.path}
-                                        item={item}
-                                        isActive={isNavActive(pathname, item.path)}
-                                        onNavigate={handleNav}
-                                        alertCount={alertCount}
-                                    />
-                                );
-                            })}
+            {/* Nav */}
+            <div className="relative min-h-0 flex-1">
+                <nav className="h-full space-y-5 overflow-y-auto px-4 pb-6 scrollbar-hide">
+                    {NAV_SECTIONS.map((section) => (
+                        <div key={section.label}>
+                            <p className="mb-1 px-2.5 text-[10px] font-medium uppercase tracking-[0.08em] text-stone-400 dark:text-stone-600">
+                                {section.label}
+                            </p>
+                            <div className="space-y-0.5">
+                                {section.items.map((path) => {
+                                    const item = findNavItem(path);
+                                    if (!item) return null;
+                                    return (
+                                        <NavItem
+                                            key={item.path}
+                                            item={item}
+                                            isActive={isNavActive(pathname, item.path)}
+                                            onNavigate={handleNav}
+                                            alertCount={alertCount}
+                                        />
+                                    );
+                                })}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </nav>
+                    ))}
+                </nav>
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-stone-50 to-transparent dark:from-stone-950" />
+            </div>
 
-            <div className="px-4 pb-4 pt-3 border-t border-stone-200 dark:border-white/[0.07]">
-                <div className="flex items-center gap-1 p-0.5 rounded-lg bg-stone-100 dark:bg-white/[0.03] mb-3">
-                    {THEME_ORDER.map((t) => {
-                        const Icon = THEME_ICONS[t];
-                        const active = theme === t;
+            {/* Footer */}
+            <div className="border-t border-stone-200 px-4 pb-4 pt-3 dark:border-white/[0.07]">
+                <div
+                    role="group"
+                    aria-label="Theme"
+                    className="mb-3 flex items-center gap-1 rounded-full bg-stone-100/80 p-1 ring-1 ring-black/[0.04] dark:bg-white/[0.05] dark:ring-white/[0.07]"
+                >
+                    {THEME_OPTIONS.map((option) => {
+                        const active = theme === option.value;
                         return (
                             <button
-                                key={t}
-                                onClick={() => setTheme(t)}
+                                key={option.value}
+                                type="button"
+                                aria-pressed={active}
+                                onClick={() => setTheme(option.value)}
                                 className={cn(
-                                    'flex-1 flex items-center justify-center h-8 rounded-md transition-all duration-150',
+                                    'flex h-8 flex-1 items-center justify-center gap-1.5 rounded-full text-[11px] font-semibold transition-colors duration-150',
                                     active
-                                        ? 'bg-white dark:bg-white/[0.08] text-stone-900 dark:text-stone-100 shadow-sm'
-                                        : 'text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300'
+                                        ? 'bg-white text-orange-600 shadow-soft dark:bg-stone-800 dark:text-orange-400'
+                                        : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'
                                 )}
-                                aria-label={`${t} theme`}
                             >
-                                <Icon size={13} strokeWidth={1.8} />
+                                <option.icon size={13} strokeWidth={1.8} aria-hidden="true" />
+                                {option.label}
                             </button>
                         );
                     })}
                 </div>
 
-                <p className="text-[10px] text-stone-400 dark:text-stone-600 px-1">
-                    © {new Date().getFullYear()} {import.meta.env.VITE_APP_NAME || 'Weatherly'} · v1.0
+                <p className="px-1 text-center text-[10px] text-stone-400 dark:text-stone-600">
+                    © {new Date().getFullYear()} {import.meta.env.VITE_APP_NAME || 'Weatherly'} · v2.1.0
                 </p>
             </div>
         </aside>

@@ -1,4 +1,4 @@
-// web/src/lib/skyTheme.js
+// src/lib/skyTheme.js
 import { CONDITION_CATEGORY } from './weatherCondition';
 
 function clamp01(v) {

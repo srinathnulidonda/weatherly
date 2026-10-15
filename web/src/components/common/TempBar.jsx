@@ -1,4 +1,4 @@
-// web/src/components/common/TempBar.jsx
+// src/components/common/TempBar.jsx
 import { cn } from '@/lib/cn';
 import { Tooltip } from '../ui/Tooltip';
 import { convertTemp, getTempUnitSymbol } from '@/utils/formatters';

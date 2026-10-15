@@ -1,93 +1,83 @@
-// web/src/components/legal/LegalPage.jsx
+// src/components/legal/LegalPage.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { PageTransition } from '@/components/common/PageTransition';
 import { Card } from '@/components/ui/Card';
 import { cn } from '@/lib/cn';
 
-const TABS = [
+const LEGAL_TABS = [
     { key: 'terms', label: 'Terms', to: '/legal/terms' },
     { key: 'privacy', label: 'Privacy', to: '/legal/privacy' },
     { key: 'cookies', label: 'Cookies', to: '/legal/cookies' },
 ];
 
-function LegalPage({ title, updated, current, children }) {
-    const navigate = useNavigate();
-
+function LegalSection({ title, id, children, className }) {
     return (
-        <PageTransition className="page-shell">
-            <div className="stack-y max-w-2xl mx-auto pb-6 !gap-4 sm:!gap-5">
-                <motion.div
-                    initial={{ opacity: 0, y: -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 sm:gap-3"
-                >
-                    <button
-                        onClick={() => navigate(-1)}
-                        aria-label="Go back"
-                        className="min-touch flex items-center justify-center rounded-full text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 hover:bg-stone-900/5 dark:hover:bg-white/[0.06] transition-colors shrink-0"
-                    >
-                        <ArrowLeft size={18} aria-hidden="true" />
-                    </button>
-                    <div className="min-w-0">
-                        <h1 className="page-heading truncate">{title}</h1>
-                        {updated && (
-                            <p className="text-[11px] sm:text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                                Last updated: {updated}
-                            </p>
-                        )}
-                    </div>
-                </motion.div>
-
-                <motion.nav
-                    aria-label="Legal documents"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.04 }}
-                    className="flex items-center gap-1 bg-stone-100 dark:bg-white/[0.05] rounded-full p-1 w-full sm:w-fit overflow-x-auto"
-                >
-                    {TABS.map((tab) => (
-                        <Link
-                            key={tab.key}
-                            to={tab.to}
-                            className={cn(
-                                'flex-1 sm:flex-none text-center px-3.5 sm:px-4 h-9 sm:h-10 flex items-center justify-center text-[12px] sm:text-xs font-semibold rounded-full transition-colors whitespace-nowrap',
-                                current === tab.key
-                                    ? 'bg-white dark:bg-white/[0.10] text-orange-500 shadow-soft'
-                                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-                            )}
-                            aria-current={current === tab.key ? 'page' : undefined}
-                        >
-                            {tab.label}
-                        </Link>
-                    ))}
-                </motion.nav>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.08, duration: 0.35 }}
-                >
-                    <Card padding="lg">
-                        <div className="stack-y !gap-4 sm:!gap-5 text-[13px] sm:text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-                            {children}
-                        </div>
-                    </Card>
-                </motion.div>
+        <section
+            id={id}
+            className={cn(
+                'scroll-mt-20 py-4 sm:py-5 first:pt-0 border-t border-stone-200/70 first:border-t-0 dark:border-white/[0.06]',
+                className
+            )}
+        >
+            {title ? (
+                <h2 className="mb-1.5 sm:mb-2 text-[13.5px] sm:text-base font-semibold text-stone-900 dark:text-stone-100">
+                    {title}
+                </h2>
+            ) : null}
+            <div className="space-y-2 sm:space-y-3 text-[12.5px] sm:text-sm leading-relaxed text-stone-600 dark:text-stone-300">
+                {children}
             </div>
-        </PageTransition>
+        </section>
     );
 }
 
-function LegalSection({ title, children }) {
+function LegalPage({ title, updated, current, children, className }) {
+    const navigate = useNavigate();
+
     return (
-        <section>
-            <h2 className="text-[13px] sm:text-sm font-semibold text-stone-900 dark:text-stone-100 mb-1.5 sm:mb-2">
-                {title}
-            </h2>
-            <div className="space-y-2 sm:space-y-2.5">{children}</div>
-        </section>
+        <PageTransition className={cn('page-shell stack-y !gap-3 sm:!gap-4', className)}>
+            <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="inline-flex w-fit items-center gap-1 sm:gap-1.5 text-[12.5px] sm:text-sm font-medium text-stone-500 transition-colors hover:text-orange-600 dark:text-stone-400 dark:hover:text-orange-400"
+            >
+                <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                Back
+            </button>
+
+            <header className="space-y-1 sm:space-y-1.5">
+                <h1 className="page-heading">{title}</h1>
+                {updated ? (
+                    <p className="text-[11px] sm:text-sm text-stone-400 dark:text-stone-500">Last updated {updated}</p>
+                ) : null}
+            </header>
+
+            <nav aria-label="Legal documents" className="grid grid-cols-3 gap-1 sm:flex sm:w-fit sm:gap-1.5">
+                {LEGAL_TABS.map((tab) => {
+                    const active = tab.key === current;
+                    return (
+                        <Link
+                            key={tab.key}
+                            to={tab.to}
+                            aria-current={active ? 'page' : undefined}
+                            className={cn(
+                                'rounded-full px-2.5 sm:px-3.5 py-1.5 sm:py-1.5 text-center text-[11.5px] sm:text-sm font-medium transition-colors whitespace-nowrap',
+                                active
+                                    ? 'bg-stone-900 text-stone-50 dark:bg-stone-100 dark:text-stone-900'
+                                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70 dark:bg-white/[0.06] dark:text-stone-300 dark:hover:bg-white/[0.1]'
+                            )}
+                        >
+                            {tab.label}
+                        </Link>
+                    );
+                })}
+            </nav>
+
+            <Card padding="lg">
+                {children}
+            </Card>
+        </PageTransition>
     );
 }
 

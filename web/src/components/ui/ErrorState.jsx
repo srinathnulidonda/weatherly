@@ -1,4 +1,4 @@
-// web/src/components/ui/ErrorState.jsx
+// src/components/ui/ErrorState.jsx
 import { AlertTriangle, RefreshCw, WifiOff } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from './Button';

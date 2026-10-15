@@ -1,4 +1,4 @@
-// web/src/App.jsx
+// src/App.jsx
 import { Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { useTheme } from '@/hooks/useTheme';

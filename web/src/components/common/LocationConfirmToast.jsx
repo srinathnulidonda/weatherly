@@ -1,4 +1,4 @@
-// web/src/components/common/LocationConfirmToast.jsx
+// src/components/common/LocationConfirmToast.jsx
 import { AnimatePresence, motion } from 'framer-motion';
 import { MapPin, Check, Pencil } from 'lucide-react';
 import { useLocation } from '@/hooks/useLocation';

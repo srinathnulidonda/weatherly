@@ -1,4 +1,4 @@
-// web/src/components/download/InfoStrip.jsx
+// src/components/download/InfoStrip.jsx
 import { cn } from '@/lib/cn';
 
 function InfoStrip({ items = [], className }) {

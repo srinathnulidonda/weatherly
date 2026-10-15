@@ -1,4 +1,4 @@
-// web/src/hooks/useTheme.js
+// src/hooks/useTheme.js
 import { useEffect, useState, useCallback } from 'react';
 import { useStore } from '../stores/store';
 

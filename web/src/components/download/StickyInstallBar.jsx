@@ -1,4 +1,4 @@
-// web/src/components/download/StickyInstallBar.jsx
+// src/components/download/StickyInstallBar.jsx
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppIcon } from './AppIcon';
 import { DownloadButton } from './DownloadButton';

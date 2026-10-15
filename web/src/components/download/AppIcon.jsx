@@ -1,4 +1,4 @@
-// web/src/components/download/AppIcon.jsx
+// src/components/download/AppIcon.jsx
 import logoImage from '@/assets/app_icon.webp';
 
 function AppIcon({ size = 72, className = '' }) {

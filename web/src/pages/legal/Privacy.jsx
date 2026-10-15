@@ -1,4 +1,4 @@
-// web/src/pages/legal/Privacy.jsx
+// src/pages/legal/Privacy.jsx
 import { LegalPage } from '@/components/legal/LegalPage';
 
 const { Section } = LegalPage;

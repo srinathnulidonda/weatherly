@@ -1,4 +1,4 @@
-// web/src/pages/Releases.jsx
+// src/pages/Releases.jsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, ChevronRight, Hash, Package, RefreshCw, Search, ShieldAlert, Tag, X } from 'lucide-react';
