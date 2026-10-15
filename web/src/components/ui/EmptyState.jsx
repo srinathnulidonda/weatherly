@@ -1,4 +1,4 @@
-// web/src/components/ui/EmptyState.jsx
+// src/components/ui/EmptyState.jsx
 import { cn } from '@/lib/cn';
 
 function EmptyState({ icon: Icon, title, description, action, className }) {

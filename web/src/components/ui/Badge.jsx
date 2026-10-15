@@ -1,4 +1,4 @@
-// web/src/components/ui/Badge.jsx
+// src/components/ui/Badge.jsx
 import { cn } from '@/lib/cn';
 
 const variantClasses = {

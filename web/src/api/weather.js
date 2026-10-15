@@ -1,4 +1,4 @@
-// web/src/api/weather.js
+// src/api/weather.js
 import client from './client';
 
 const W = '/api/v1/weather';

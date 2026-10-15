@@ -1,4 +1,4 @@
-// web/src/components/common/OfflineBanner.jsx
+// src/components/common/OfflineBanner.jsx
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { WifiOff } from 'lucide-react';

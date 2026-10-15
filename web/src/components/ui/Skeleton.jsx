@@ -1,4 +1,4 @@
-// web/src/components/ui/Skeleton.jsx
+// src/components/ui/Skeleton.jsx
 import { cn } from '@/lib/cn';
 
 function Skeleton({ className, ...props }) {

@@ -1,4 +1,4 @@
-// web/src/components/home/LocationBar.jsx
+// src/components/home/LocationBar.jsx
 import { MapPin, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useStore } from '@/stores/store';

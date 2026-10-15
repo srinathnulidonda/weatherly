@@ -1,4 +1,4 @@
-// web/src/components/forecast/PrecipitationTimeline.jsx
+// src/components/forecast/PrecipitationTimeline.jsx
 import { useMemo } from 'react';
 import { CloudRain, Umbrella } from 'lucide-react';
 import { cn } from '@/lib/cn';

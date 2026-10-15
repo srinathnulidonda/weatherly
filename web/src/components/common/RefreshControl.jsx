@@ -1,4 +1,4 @@
-// web/src/components/common/RefreshControl.jsx
+// src/components/common/RefreshControl.jsx
 import { useState, useCallback, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';

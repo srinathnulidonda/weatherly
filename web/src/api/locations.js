@@ -1,4 +1,4 @@
-// web/src/api/locations.js
+// src/api/locations.js
 import client from './client';
 
 const BASE = '/api/v1/locations';

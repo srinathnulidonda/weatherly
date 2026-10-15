@@ -1,4 +1,4 @@
-// web/src/components/home/CurrentWeather.jsx
+// src/components/home/CurrentWeather.jsx
 import { motion } from 'framer-motion';
 import { Droplets, Wind, Eye, Sun } from 'lucide-react';
 import { cn } from '@/lib/cn';

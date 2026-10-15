@@ -1,4 +1,4 @@
-// web/src/components/ui/ErrorBoundary.jsx
+// src/components/ui/ErrorBoundary.jsx
 import { Component } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-/* web/src/index.css */
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -334,6 +334,11 @@
     .min-touch {
         min-width: 44px;
         min-height: 44px;
+    }
+
+    .mask-fade-x {
+        mask-image: linear-gradient(to right, transparent 0, black 20px, black calc(100% - 20px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0, black 20px, black calc(100% - 20px), transparent 100%);
     }
 
     @media (min-width: 475px) {

@@ -1,4 +1,4 @@
-// web/src/components/home/AirQuality.jsx
+// src/components/home/AirQuality.jsx
 import { useMemo } from 'react';
 import { ShieldCheck, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/cn';

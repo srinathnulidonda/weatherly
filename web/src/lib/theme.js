@@ -1,4 +1,4 @@
-// web/src/lib/theme.js
+// src/lib/theme.js
 export const SEVERITY_TOKENS = {
     extreme: { hex: '#DC2626', bg: 'bg-red-600', text: 'text-white', dot: 'bg-red-400', label: 'Extreme' },
     severe: { hex: '#F97316', bg: 'bg-orange-500', text: 'text-white', dot: 'bg-orange-300', label: 'Severe' },

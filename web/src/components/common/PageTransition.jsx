@@ -1,4 +1,4 @@
-// web/src/components/common/PageTransition.jsx
+// src/components/common/PageTransition.jsx
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/cn';
 

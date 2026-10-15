@@ -1,4 +1,4 @@
-// web/src/components/forecast/HourlyScrubber.jsx
+// src/components/forecast/HourlyScrubber.jsx
 import { useMemo, useRef, useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle } from '../ui/Card';
 import { WeatherIcon } from '../ui/WeatherIcon';

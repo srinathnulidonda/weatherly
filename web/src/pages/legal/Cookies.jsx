@@ -1,4 +1,4 @@
-// web/src/pages/legal/Cookies.jsx
+// src/pages/legal/Cookies.jsx
 import { LegalPage } from '@/components/legal/LegalPage';
 
 const { Section } = LegalPage;

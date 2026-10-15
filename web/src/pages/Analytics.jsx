@@ -1,4 +1,4 @@
-// web/src/pages/Analytics.jsx
+// src/pages/Analytics.jsx
 import { useState, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';

@@ -1,4 +1,4 @@
-// web/src/components/download/CopyLinkButton.jsx
+// src/components/download/CopyLinkButton.jsx
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Link as LinkIcon } from 'lucide-react';

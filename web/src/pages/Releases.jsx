@@ -1,4 +1,4 @@
-// web/src/pages/Releases.jsx
+// src/pages/Releases.jsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, ChevronRight, Hash, Package, RefreshCw, Search, ShieldAlert, Tag, X } from 'lucide-react';
@@ -7,6 +7,7 @@ import { formatDate } from '@/utils/formatters';
 import { InfoStrip } from '@/components/download/InfoStrip';
 import { CopyLinkButton } from '@/components/download/CopyLinkButton';
 import { DownloadButton } from '@/components/download/DownloadButton';
+import { StickyInstallBar } from '@/components/download/StickyInstallBar';
 
 function formatBytes(bytes) {
     const n = Number(bytes);
@@ -108,7 +109,7 @@ function ReleaseRow({ release, isLatest }) {
                     </div>
                 </div>
 
-                <div className="min-w-0 lg:pt-1">
+                <div className="min-w-0 pt-4 mt-1 border-t border-stone-100 dark:border-white/[0.06] lg:pt-1 lg:mt-0 lg:border-0">
                     {changelog.length > 0 ? (
                         <>
                             <ul className="space-y-1.5">
@@ -174,6 +175,8 @@ function Releases() {
     const [query, setQuery] = useState('');
     const [activeId, setActiveId] = useState(null);
     const sectionRefs = useRef(new Map());
+    const headerRef = useRef(null);
+    const [pastHeader, setPastHeader] = useState(false);
 
     const sorted = useMemo(
         () => [...releases].sort((a, b) => (b.build_number ?? 0) - (a.build_number ?? 0)),
@@ -190,6 +193,11 @@ function Releases() {
         );
     }, [sorted, query, isSearching]);
 
+    const activeRelease = useMemo(() => {
+        if (isSearching) return null;
+        return sorted.find((r) => releaseId(r) === activeId) || latest;
+    }, [sorted, activeId, latest, isSearching]);
+
     useEffect(() => {
         if (!sorted.length || isSearching) return undefined;
         const observer = new IntersectionObserver(
@@ -203,7 +211,19 @@ function Releases() {
         return () => observer.disconnect();
     }, [sorted, isSearching]);
 
+    useEffect(() => {
+        const node = headerRef.current;
+        if (!node || !latest) return undefined;
+        const observer = new IntersectionObserver(
+            ([entry]) => setPastHeader(!entry.isIntersecting),
+            { rootMargin: '-64px 0px 0px 0px', threshold: 0 }
+        );
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [latest]);
+
     const showNav = !isSearching && sorted.length > 1;
+    const showStickyBar = pastHeader && !isSearching && !!activeRelease;
     const latestDate = latest?.released_at ?? null;
     const latestSize = latest?.file_size_bytes ?? null;
 
@@ -212,7 +232,7 @@ function Releases() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-28 md:pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-36 md:pb-16">
             <Breadcrumb />
 
             <div className="mb-6">
@@ -243,38 +263,44 @@ function Releases() {
 
             {!isLoading && !error && latest && (
                 <>
-                    <InfoStrip
-                        className="mb-6"
-                        items={[
-                            { icon: Tag, value: `v${latest.version}`, label: 'Latest' },
-                            { icon: Hash, value: latest.build_number ?? '—', label: 'Build' },
-                            { icon: Package, value: formatBytes(latestSize), label: 'Size' },
-                            { icon: Calendar, value: latestDate ? formatDate(latestDate) : '—', label: 'Released' },
-                        ]}
-                    />
+                    <div ref={headerRef}>
+                        <InfoStrip
+                            className="mb-6"
+                            items={[
+                                { icon: Tag, value: `v${latest.version}`, label: 'Latest' },
+                                { icon: Hash, value: latest.build_number ?? '—', label: 'Build' },
+                                { icon: Package, value: formatBytes(latestSize), label: 'Size' },
+                                { icon: Calendar, value: latestDate ? formatDate(latestDate) : '—', label: 'Released' },
+                            ]}
+                        />
 
-                    <div className="relative mb-5">
-                        <Search
-                            size={15}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
-                            aria-hidden="true"
-                        />
-                        <input
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search by version or build number"
-                            className="w-full rounded-2xl border border-stone-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.02] pl-10 pr-10 py-2.5 text-[13.5px] text-stone-900 dark:text-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-400/50"
-                        />
-                        {isSearching && (
-                            <button
-                                type="button"
-                                onClick={() => setQuery('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
-                                aria-label="Clear search"
-                            >
-                                <X size={15} />
-                            </button>
-                        )}
+                        <div className="relative mb-5">
+                            <Search
+                                size={15}
+                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
+                                aria-hidden="true"
+                            />
+                            <input
+                                type="search"
+                                inputMode="search"
+                                enterKeyHint="search"
+                                autoComplete="off"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder="Search by version or build number"
+                                className="w-full rounded-2xl border border-stone-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.02] pl-10 pr-10 py-2.5 text-[13.5px] text-stone-900 dark:text-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-400/50 [&::-webkit-search-cancel-button]:appearance-none"
+                            />
+                            {isSearching && (
+                                <button
+                                    type="button"
+                                    onClick={() => setQuery('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
+                                    aria-label="Clear search"
+                                >
+                                    <X size={15} />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {isSearching && (
@@ -284,24 +310,26 @@ function Releases() {
                     )}
 
                     {showNav && (
-                        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 mb-2 -mx-4 px-4 scrollbar-none">
-                            {sorted.map((r) => {
-                                const id = releaseId(r);
-                                const active = activeId === id;
-                                return (
-                                    <button
-                                        key={id}
-                                        type="button"
-                                        onClick={() => jumpTo(id)}
-                                        className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${active
-                                            ? 'border-orange-400 bg-orange-500/10 text-orange-600 dark:text-orange-400'
-                                            : 'border-stone-200 dark:border-white/[0.1] text-stone-500 dark:text-stone-400'
-                                            }`}
-                                    >
-                                        v{r.version}
-                                    </button>
-                                );
-                            })}
+                        <div className="lg:hidden -mx-4 px-4 mb-2 relative">
+                            <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide mask-fade-x">
+                                {sorted.map((r) => {
+                                    const id = releaseId(r);
+                                    const active = activeId === id;
+                                    return (
+                                        <button
+                                            key={id}
+                                            type="button"
+                                            onClick={() => jumpTo(id)}
+                                            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${active
+                                                ? 'border-orange-400 bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                                                : 'border-stone-200 dark:border-white/[0.1] text-stone-500 dark:text-stone-400'
+                                                }`}
+                                        >
+                                            v{r.version}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
 
@@ -361,6 +389,15 @@ function Releases() {
                             )}
                         </div>
                     </div>
+
+                    <StickyInstallBar
+                        show={showStickyBar}
+                        version={activeRelease?.version}
+                        subtitle={`${formatBytes(activeRelease?.file_size_bytes)} · Build ${activeRelease?.build_number ?? '—'}`}
+                        badge={activeRelease && activeRelease === latest ? 'Latest' : null}
+                        url={activeRelease?.apk_url}
+                        filename={activeRelease ? `weatherly-v${activeRelease.version}.apk` : undefined}
+                    />
                 </>
             )}
         </div>

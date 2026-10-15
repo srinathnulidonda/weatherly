@@ -1,4 +1,4 @@
-// web/src/components/common/LocationResultsList.jsx
+// src/components/common/LocationResultsList.jsx
 import { MapPin, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { getFlagEmoji } from '@/utils/flags';

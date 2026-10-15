@@ -1,5 +1,5 @@
-// web/src/pages/Download.jsx
-import { useMemo } from 'react';
+// src/pages/Download.jsx
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     ChevronRight,
@@ -13,13 +13,17 @@ import {
     Calendar,
     ShieldAlert,
     FileCode2,
+    Copy,
+    Check,
 } from 'lucide-react';
 import { useReleases } from '@/hooks/useReleases';
 import { formatDate } from '@/utils/formatters';
+import { cn } from '@/lib/cn';
 import { AppIcon } from '@/components/download/AppIcon';
 import { InfoStrip } from '@/components/download/InfoStrip';
 import { CopyLinkButton } from '@/components/download/CopyLinkButton';
 import { DownloadButton } from '@/components/download/DownloadButton';
+import { StickyInstallBar } from '@/components/download/StickyInstallBar';
 
 function formatBytes(bytes) {
     const n = Number(bytes);
@@ -47,16 +51,61 @@ function Breadcrumb() {
     );
 }
 
-function SpecRow({ label, value, mono = false }) {
+function SpecRow({ label, value, mono = false, copyable = false }) {
+    const [copied, setCopied] = useState(false);
+    const isLongValue = typeof value === 'string' && value.length > 20;
+
+    const handleCopy = async () => {
+        if (!copyable || typeof value !== 'string' || value === '—') return;
+        try {
+            await navigator.clipboard.writeText(value);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+        } catch {
+            setCopied(false);
+        }
+    };
+
     return (
-        <div className="flex items-center justify-between gap-4 py-2.5 border-b border-stone-100 dark:border-white/[0.06] last:border-0">
+        <div
+            className={cn(
+                'py-2.5 border-b border-stone-100 dark:border-white/[0.06] last:border-0 gap-1.5',
+                isLongValue ? 'flex flex-col items-start' : 'flex items-center justify-between gap-4'
+            )}
+        >
             <span className="text-[13px] text-stone-500 dark:text-stone-400 shrink-0">{label}</span>
-            <span
-                className={`text-[13px] text-stone-900 dark:text-stone-100 font-medium text-right truncate max-w-[60%] ${mono ? 'font-mono text-[11.5px]' : ''}`}
-                title={typeof value === 'string' ? value : undefined}
-            >
-                {value}
-            </span>
+            {copyable ? (
+                <button
+                    type="button"
+                    onClick={handleCopy}
+                    className={cn(
+                        'inline-flex items-center gap-1.5 rounded-md text-stone-900 dark:text-stone-100 font-medium transition-colors',
+                        'hover:text-orange-600 dark:hover:text-orange-400 active:scale-[0.98]',
+                        mono && 'font-mono text-[11px] sm:text-[11.5px]',
+                        isLongValue ? 'text-left break-all w-full' : 'text-[13px] text-right truncate max-w-[60%]'
+                    )}
+                    title={typeof value === 'string' ? value : undefined}
+                    aria-label={`Copy ${label}`}
+                >
+                    <span className={isLongValue ? 'break-all' : 'truncate'}>{value}</span>
+                    {copied ? (
+                        <Check size={12} className="text-green-500 shrink-0" aria-hidden="true" />
+                    ) : (
+                        <Copy size={12} className="text-stone-400 shrink-0" aria-hidden="true" />
+                    )}
+                </button>
+            ) : (
+                <span
+                    className={cn(
+                        'text-[13px] text-stone-900 dark:text-stone-100 font-medium',
+                        mono && 'font-mono text-[11.5px]',
+                        isLongValue ? 'text-left break-all w-full' : 'text-right truncate max-w-[60%]'
+                    )}
+                    title={typeof value === 'string' ? value : undefined}
+                >
+                    {value}
+                </span>
+            )}
         </div>
     );
 }
@@ -104,8 +153,22 @@ function Download() {
     const sizeBytes = latest?.file_size_bytes ?? null;
     const changelog = latest?.changelog ?? [];
 
+    const ctaRef = useRef(null);
+    const [showSticky, setShowSticky] = useState(false);
+
+    useEffect(() => {
+        const node = ctaRef.current;
+        if (!node || !latest) return undefined;
+        const observer = new IntersectionObserver(
+            ([entry]) => setShowSticky(!entry.isIntersecting),
+            { rootMargin: '-64px 0px 0px 0px', threshold: 0 }
+        );
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [latest]);
+
     return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-28 md:pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 pb-36 md:pb-16">
             <Breadcrumb />
 
             {isLoading && <LoadingState />}
@@ -125,23 +188,23 @@ function Download() {
                     <section className="rounded-3xl border border-stone-200/70 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 sm:p-8 lg:p-10 shadow-[0_1px_0_0_rgba(0,0,0,0.02)]">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                             <div className="flex items-center gap-4 flex-1 min-w-0">
-                                <AppIcon size={76} />
+                                <AppIcon size={64} className="sm:!w-[76px] sm:!h-[76px]" />
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <h1 className="text-[19px] sm:text-[22px] font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+                                        <h1 className="text-[18px] xs:text-[19px] sm:text-[22px] font-bold text-stone-900 dark:text-stone-50 tracking-tight">
                                             Weatherly
                                         </h1>
                                         <span className="inline-flex items-center rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[11px] font-bold px-2.5 py-0.5 tabular-nums">
                                             v{latest.version}
                                         </span>
                                     </div>
-                                    <p className="text-[13.5px] text-stone-500 dark:text-stone-400 mt-0.5">
+                                    <p className="text-[13px] sm:text-[13.5px] text-stone-500 dark:text-stone-400 mt-0.5">
                                         Weather, forecasts &amp; alerts
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2 sm:shrink-0">
+                            <div ref={ctaRef} className="flex items-center gap-2 sm:shrink-0">
                                 <DownloadButton
                                     url={latest.apk_url}
                                     filename={`weatherly-v${latest.version}.apk`}
@@ -184,11 +247,11 @@ function Download() {
                                     {FEATURES.map((f) => (
                                         <div
                                             key={f.title}
-                                            className="rounded-2xl border border-stone-200/70 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4"
+                                            className="rounded-2xl border border-stone-200/70 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-3.5 sm:p-4"
                                         >
                                             <f.icon size={18} className="text-orange-500 mb-2" aria-hidden="true" />
-                                            <p className="text-[13.5px] font-semibold text-stone-900 dark:text-stone-50">{f.title}</p>
-                                            <p className="text-[12px] text-stone-500 dark:text-stone-400 mt-0.5 leading-snug">{f.desc}</p>
+                                            <p className="text-[13px] sm:text-[13.5px] font-semibold text-stone-900 dark:text-stone-50">{f.title}</p>
+                                            <p className="text-[11.5px] sm:text-[12px] text-stone-500 dark:text-stone-400 mt-0.5 leading-snug">{f.desc}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -228,11 +291,11 @@ function Download() {
                                     Technical specifications
                                 </h2>
                                 <div className="mt-2">
-                                    <SpecRow label="Package" value="com.sn.weatherly" mono />
+                                    <SpecRow label="Package" value="com.sn.weatherly" mono copyable />
                                     <SpecRow label="Min Android" value="6.0 (Marshmallow)" />
                                     <SpecRow label="Architecture" value="Universal (arm64 / armeabi)" />
                                     <SpecRow label="Build" value={latest.build_number ?? '—'} />
-                                    <SpecRow label="SHA-256" value={latest.sha256 ?? '—'} mono />
+                                    <SpecRow label="SHA-256" value={latest.sha256 ?? '—'} mono copyable={!!latest.sha256} />
                                 </div>
                             </div>
 
@@ -255,6 +318,16 @@ function Download() {
                         </aside>
                     </div>
                 </div>
+            )}
+
+            {latest && (
+                <StickyInstallBar
+                    show={showSticky}
+                    version={latest.version}
+                    subtitle={`${formatBytes(sizeBytes)} · Build ${latest.build_number ?? '—'}`}
+                    url={latest.apk_url}
+                    filename={`weatherly-v${latest.version}.apk`}
+                />
             )}
         </div>
     );

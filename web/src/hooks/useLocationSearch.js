@@ -1,4 +1,4 @@
-// web/src/hooks/useLocationSearch.js
+// src/hooks/useLocationSearch.js
 import { useState, useEffect } from 'react';
 import { locationsApi } from '@/api/locations';
 

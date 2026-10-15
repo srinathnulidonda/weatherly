@@ -1,4 +1,4 @@
-// web/src/components/home/LocationPager.jsx
+// src/components/home/LocationPager.jsx
 import { useCallback, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';

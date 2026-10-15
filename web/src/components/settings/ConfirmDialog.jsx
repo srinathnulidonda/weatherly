@@ -1,4 +1,4 @@
-// web/src/components/settings/ConfirmDialog.jsx
+// src/components/settings/ConfirmDialog.jsx
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';

@@ -1,4 +1,4 @@
-// web/src/stores/store.js
+// src/stores/store.js
 import { create } from 'zustand';
 import { STORAGE_KEYS } from '../utils/constants';
 

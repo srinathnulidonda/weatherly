@@ -1,4 +1,4 @@
-// web/src/components/nav/TopAppBar.jsx
+// src/components/nav/TopAppBar.jsx
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { MapPin, ChevronDown, Search } from 'lucide-react';

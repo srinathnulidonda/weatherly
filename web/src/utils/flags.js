@@ -1,4 +1,4 @@
-// web/src/utils/flags.js
+// src/utils/flags.js
 /**
  * Converts a two-letter country code to a flag emoji
  * @param {string} countryCode - Two-letter country code (ISO 3166-1 alpha-2)

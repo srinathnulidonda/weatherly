@@ -1,4 +1,4 @@
-// web/src/hooks/useReleases.js
+// src/hooks/useReleases.js
 import { useQuery } from '@tanstack/react-query';
 
 async function fetchReleases() {

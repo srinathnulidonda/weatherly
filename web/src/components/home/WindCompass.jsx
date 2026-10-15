@@ -1,4 +1,4 @@
-// web/src/components/home/WindCompass.jsx
+// src/components/home/WindCompass.jsx
 import { useId } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/cn';

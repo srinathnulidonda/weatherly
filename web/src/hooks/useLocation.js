@@ -1,4 +1,4 @@
-// web/src/hooks/useLocation.js
+// src/hooks/useLocation.js
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../stores/store';
 import { locationsApi } from '../api/locations';

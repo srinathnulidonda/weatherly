@@ -1,4 +1,4 @@
-// web/src/lib/weatherCondition.js
+// src/lib/weatherCondition.js
 export const CONDITION_CATEGORY = {
     CLEAR: 'clear',
     PARTLY_CLOUDY: 'partly_cloudy',

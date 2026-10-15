@@ -1,4 +1,4 @@
-// web/src/components/ui/Tooltip.jsx
+// src/components/ui/Tooltip.jsx
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';

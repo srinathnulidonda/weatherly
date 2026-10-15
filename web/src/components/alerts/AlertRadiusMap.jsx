@@ -1,4 +1,4 @@
-// web/src/components/alerts/AlertRadiusMap.jsx
+// src/components/alerts/AlertRadiusMap.jsx
 import { useMemo } from 'react';
 import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/cn';

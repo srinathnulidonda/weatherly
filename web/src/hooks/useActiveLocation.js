@@ -1,4 +1,4 @@
-// web/src/hooks/useActiveLocation.js
+// src/hooks/useActiveLocation.js
 import { useMemo } from 'react';
 import { useStore } from '@/stores/store';
 

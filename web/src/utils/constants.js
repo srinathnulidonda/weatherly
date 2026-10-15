@@ -1,4 +1,4 @@
-// web/src/utils/constants.js
+// src/utils/constants.js
 export const STORAGE_KEYS = {
     CONFIRMED_LOCATION: 'weatherly_confirmed_location',
     LOCATION_USER_CONFIRMED: 'weatherly_location_user_confirmed',
